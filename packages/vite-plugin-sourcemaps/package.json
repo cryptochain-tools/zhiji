@@ -16,10 +16,10 @@
   "keywords": ["vite", "sourcemap", "error-monitoring", "observability"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cryptochain-tools/zhiji.git",
+    "url": "git+https://github.com/earntools-labs/zhiji.git",
     "directory": "packages/vite-plugin-sourcemaps"
   },
-  "homepage": "https://github.com/cryptochain-tools/zhiji",
+  "homepage": "https://github.com/earntools-labs/zhiji",
   "publishConfig": { "access": "public" },
   "scripts": {
     "build": "tsc -p tsconfig.json",

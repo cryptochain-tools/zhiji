@@ -27,4 +27,4 @@ The SDK sends data to same-origin `/api/ingest/*` endpoints by default. To repor
 
 The SDK stores a stable anonymous visitor ID in a first-party cookie. Behavior capture, replay, and performance collection remain disabled until explicitly enabled by the project policy and client options. It does not collect form values, complete DOM, or network request bodies.
 
-See the repository [integration guide](https://github.com/cryptochain-tools/zhiji#sdk-%E4%B8%8E%E9%87%87%E9%9B%86) and [security policy](https://github.com/cryptochain-tools/zhiji/blob/main/SECURITY.md).
+See the repository [integration guide](https://github.com/earntools-labs/zhiji#sdk-%E4%B8%8E%E9%87%87%E9%9B%86) and [security policy](https://github.com/earntools-labs/zhiji/blob/main/SECURITY.md).

@@ -59,7 +59,7 @@ function DocsIndex({ Link }: { Link: ComponentType<LinkProps> }) {
       <div className="pub-docs-start"><span>推荐从这里开始</span><Link href="/docs/quickstart">浏览器快速开始 <b>→</b></Link></div>
       <aside className="pub-docs-open-source" aria-label="开源发布状态">
         <div><p>开放源码</p><h2>先从已发布的 Browser SDK 开始。</h2><span>当前版本 <b>@zhiji-labs/browser-sdk 0.1.1</b>；Node、React Native 与 Python SDK 均为计划中，尚未提供可安装的公开包。</span></div>
-        <div className="pub-docs-open-source-links"><a href="https://github.com/cryptochain-tools/zhiji" target="_blank" rel="noreferrer">查看 GitHub <b aria-hidden="true">↗</b></a><Link href="/self-hosting">了解自部署</Link><small>平台采用 AGPL-3.0；SDK 与 Vite 插件按各目录中的 MIT License 发布。</small></div>
+        <div className="pub-docs-open-source-links"><a href="https://github.com/earntools-labs/zhiji" target="_blank" rel="noreferrer">查看 GitHub <b aria-hidden="true">↗</b></a><Link href="/self-hosting">了解自部署</Link><small>平台采用 AGPL-3.0；SDK 与 Vite 插件按各目录中的 MIT License 发布。</small></div>
       </aside>
       {navigation.map(section => {
         const sectionCards = results.filter(card => card.group === section.group)
@@ -199,7 +199,7 @@ zhiji.logout()`}</Code></> },
       { id: 'architecture', title: '运行组成', body: <div className="pub-docs-operation-grid"><Card variant="card"><b>Web API</b><p>处理管理台、项目配置和采集请求。</p></Card><Card variant="card"><b>Worker</b><p>处理 outbox、保留、导出、通知和数据处置。</p></Card><Card variant="card"><b>PostgreSQL</b><p>保存受限事实和事务状态，单独管理访问权限。</p></Card><Card variant="card"><b>私有工件存储</b><p>保存构建工件、导出和受控回放数据。</p></Card></div> },
       { id: 'checklist', title: '上线前检查', body: <div className="pub-docs-checklist"><div><i>01</i><span><b>隔离环境</b>准备独立数据库、环境文件与最小权限账号。</span></div><div><i>02</i><span><b>配置 HTTPS</b>确认反向代理、Origin 与外发出口。</span></div><div><i>03</i><span><b>验证恢复</b>在变更前验证备份、迁移窗口和 readiness。</span></div></div> },
       { id: 'upgrade', title: '升级与恢复', body: <p>升级前记录备份与回滚窗口，并使用受控迁移账号运行既有 migration。恢复时先恢复数据和工件，再验证 Worker、服务状态和 readiness；每一步都应留下可追溯的记录。</p> },
-      { id: 'public-install', title: '公开安装与 Release', body: <p>安装步骤以公开仓库中的 <a href="https://github.com/cryptochain-tools/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">安装文档</a> 与 <a href="https://github.com/cryptochain-tools/zhiji/releases" target="_blank" rel="noreferrer">Release</a> 为准。生产部署请固定 Release 或提交，并在升级前完成备份与恢复验证。</p> },
+      { id: 'public-install', title: '公开安装与 Release', body: <p>安装步骤以公开仓库中的 <a href="https://github.com/earntools-labs/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">安装文档</a> 与 <a href="https://github.com/earntools-labs/zhiji/releases" target="_blank" rel="noreferrer">Release</a> 为准。生产部署请固定 Release 或提交，并在升级前完成备份与恢复验证。</p> },
     ],
   },
   changelog: {

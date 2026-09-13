@@ -28,8 +28,8 @@ function SelfHosting({ Link }: { Link: ComponentType<LinkProps> }) {
   return <div className="pub-info pub-info--hosting">
     <PageHero overline="自部署" title={<>数据留在你的<br /><em>运行环境里。</em></>} lead="知迹可部署在你管理的服务器上。应用、数据库和用于处理后台任务的 Worker 各自运行，数据怎样保存、备份和访问，由你决定。">
       <div className="pub-info__actions">
-        <Button asChild nativeButton={false} size="lg"><a href="https://github.com/cryptochain-tools/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">阅读安装文档 <span aria-hidden="true">↗</span></a></Button>
-        <Button asChild nativeButton={false} variant="outline" size="lg"><a href="https://github.com/cryptochain-tools/zhiji/releases" target="_blank" rel="noreferrer">查看 Release <span aria-hidden="true">↗</span></a></Button>
+        <Button asChild nativeButton={false} size="lg"><a href="https://github.com/earntools-labs/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">阅读安装文档 <span aria-hidden="true">↗</span></a></Button>
+        <Button asChild nativeButton={false} variant="outline" size="lg"><a href="https://github.com/earntools-labs/zhiji/releases" target="_blank" rel="noreferrer">查看 Release <span aria-hidden="true">↗</span></a></Button>
       </div>
     </PageHero>
     <section className="wrap pub-info__hosting-stage" aria-label="知迹自部署结构示意">
@@ -54,7 +54,7 @@ function SelfHosting({ Link }: { Link: ComponentType<LinkProps> }) {
           <li><span>02</span><h3>连接独立数据存储</h3><p>使用独立的 PostgreSQL；需要保留工件时，准备受控的私有对象存储。</p></li>
           <li><span>03</span><h3>迁移、检查并启动</h3><p>在备份和回滚窗口确认后运行迁移，检查服务、Worker 与就绪状态。</p></li>
         </ol>
-        <div className="pub-info__detail-link"><a href="https://github.com/cryptochain-tools/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">查看公开安装文档 <span aria-hidden="true">↗</span></a><p>安装文档说明环境文件、迁移顺序和运行检查；生产环境请使用经过验证的固定版本。</p></div>
+        <div className="pub-info__detail-link"><a href="https://github.com/earntools-labs/zhiji/blob/main/deploy/README.md" target="_blank" rel="noreferrer">查看公开安装文档 <span aria-hidden="true">↗</span></a><p>安装文档说明环境文件、迁移顺序和运行检查；生产环境请使用经过验证的固定版本。</p></div>
       </div>
     </section>
     <section className="wrap pub-info__responsibility">
@@ -116,7 +116,7 @@ function Pricing({ Link }: { Link: ComponentType<LinkProps> }) {
       </div>
     </section>
     <section className="wrap pub-info__price-plain">
-      <p className="pub-info__overline"><i />当前可以确认的</p><h2>软件免费，运行环境需要自己负责。</h2><div><p>AGPL-3.0 覆盖平台软件；Browser SDK 与后续 SDK、插件会以各自声明的宽松许可证发布。你仍需要为服务器、数据库、对象存储、带宽、备份和日常运维付费。仓库公开前，请以本页和正式 Release 的声明为准。</p><a href="https://github.com/cryptochain-tools/zhiji/blob/main/LICENSE" target="_blank" rel="noreferrer">查看 AGPL-3.0 许可证 <span aria-hidden="true">↗</span></a></div>
+      <p className="pub-info__overline"><i />当前可以确认的</p><h2>软件免费，运行环境需要自己负责。</h2><div><p>AGPL-3.0 覆盖平台软件；Browser SDK 与后续 SDK、插件会以各自声明的宽松许可证发布。你仍需要为服务器、数据库、对象存储、带宽、备份和日常运维付费。仓库公开前，请以本页和正式 Release 的声明为准。</p><a href="https://github.com/earntools-labs/zhiji/blob/main/LICENSE" target="_blank" rel="noreferrer">查看 AGPL-3.0 许可证 <span aria-hidden="true">↗</span></a></div>
     </section>
     <section className="pub-info__closing"><div className="wrap"><div><p>从实际需求出发</p><h2>看看知迹是否适合你。</h2></div><Button asChild nativeButton={false} size="lg"><Link href="/product">浏览产品能力 <span aria-hidden="true">→</span></Link></Button></div></section>
   </div>

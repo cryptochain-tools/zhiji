@@ -16,13 +16,13 @@
   "keywords": ["analytics", "error-monitoring", "observability", "web"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cryptochain-tools/zhiji.git",
+    "url": "git+https://github.com/earntools-labs/zhiji.git",
     "directory": "packages/browser-sdk"
   },
   "bugs": {
-    "url": "https://github.com/cryptochain-tools/zhiji/issues"
+    "url": "https://github.com/earntools-labs/zhiji/issues"
   },
-  "homepage": "https://github.com/cryptochain-tools/zhiji#sdk-%E4%B8%8E%E9%87%87%E9%9B%86",
+  "homepage": "https://github.com/earntools-labs/zhiji#sdk-%E4%B8%8E%E9%87%87%E9%9B%86",
   "publishConfig": {
     "access": "public"
   },

@@ -49,7 +49,7 @@ export function Home({ Link }: HomeProps) {
           <h1>看清用户行为，<br /><em>及时发现问题。</em></h1>
           <p>知迹是一款支持自部署的产品分析与错误监控工具。了解用户如何使用产品，找到转化流失、页面报错和加载缓慢的原因。</p>
           <div className="zhome-actions">
-            <Button asChild nativeButton={false} size="lg"><a href="https://github.com/cryptochain-tools/zhiji" target="_blank" rel="noreferrer">GitHub 查看源码 <span aria-hidden="true">↗</span></a></Button>
+            <Button asChild nativeButton={false} size="lg"><a href="https://github.com/earntools-labs/zhiji" target="_blank" rel="noreferrer">GitHub 查看源码 <span aria-hidden="true">↗</span></a></Button>
             <Button asChild nativeButton={false} variant="outline" size="lg"><Link href="/self-hosting">自部署知迹 →</Link></Button>
           </div>
           <p className="zhome-open-source-note">源码、许可证与自部署资料已经公开，可直接审查或部署。</p>
