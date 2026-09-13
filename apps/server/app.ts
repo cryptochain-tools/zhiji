@@ -84,7 +84,10 @@ export default function boot(app: Application) {
           project_id: record.id,
           policy_version: record.policy_version,
           cache_max_age_seconds: app.config.zhiji.sdkConfigMaxAgeSeconds,
-          page_rules: { allowed_page_keys: [ ...scoped.pagePolicy.allowedPageKeys ] },
+          page_rules: {
+            allowed_page_keys: [ ...scoped.pagePolicy.allowedPageKeys ],
+            route_templates: [ ...scoped.pagePolicy.routeTemplates ],
+          },
           behavior_capture: record.behavior_capture,
           session_replay: replayPolicy(record.session_replay),
           performance_capture: record.performance_capture,

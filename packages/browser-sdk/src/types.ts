@@ -29,6 +29,7 @@ export type BehaviorAction = "autocapture_click" | "autocapture_submit" | "autoc
 export interface BehaviorCaptureOptions {
   enabled?: boolean;
   sampleRate?: number;
+  /** Optional stable tokens for key elements; ordinary click heatmaps do not require them. */
   trackIds?: readonly string[];
   blockSelectors?: readonly string[];
   pageAllowlist?: readonly string[];
@@ -111,6 +112,20 @@ export interface ZhijiOptions {
   /** May only discard a complete, already-sanitized behavior event. */
   beforeBehaviorSend?: (event: BehaviorEvent) => boolean | void;
   debug?: boolean;
+}
+
+/**
+ * Options for loading the project's public collection policy before creating a
+ * client. `privacy` and `behaviorCapturePolicy` deliberately cannot be
+ * supplied here: they always come from the authenticated SDK config response.
+ */
+export interface ConfiguredZhijiOptions extends Omit<ZhijiOptions, "privacy" | "behaviorCapturePolicy"> {
+  /** Zhiji deployment origin. When set, it is also used for default ingest endpoints. */
+  origin?: string;
+  /** Overrides the SDK-config endpoint; useful for a reverse proxy. */
+  configEndpoint?: string;
+  /** Injectable for non-browser runtimes and tests. Defaults to global fetch. */
+  fetch?: typeof globalThis.fetch;
 }
 
 export interface FlushResult {

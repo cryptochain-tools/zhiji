@@ -2,7 +2,7 @@
 
 知迹是一套可自托管的多租户产品分析与错误监控平台。它把产品事件、错误、Web 性能、热力图和经过脱敏的会话回放放在同一个项目工作台中，并用独立采集通道控制限流、重试和数据保留。
 
-> 项目源码已经公开。Browser SDK 已发布为 `@zhiji-labs/browser-sdk@0.1.1`；Node、Python 与 Mobile SDK 仍处于计划或预览阶段。
+> 项目源码已经公开。Browser SDK 已发布为 `@zhiji-labs/browser-sdk@0.2.0`；Node、Python 与 Mobile SDK 仍处于计划或预览阶段。
 
 ## 已实现能力
 
@@ -85,11 +85,13 @@ pnpm add @zhiji-labs/browser-sdk
 ```
 
 ```ts
-import { init } from '@zhiji-labs/browser-sdk'
+import { initFromConfig } from '@zhiji-labs/browser-sdk'
 
-const zhiji = init({
+const zhiji = await initFromConfig({
   key: 'zj_pk_your_project_key',
   release: '2026.09.13',
+  origin: 'https://zhiji.example.com',
+  performance: true,
 })
 
 zhiji.track('pricing_viewed', { plan: 'pro' })
@@ -102,7 +104,7 @@ Browser Key 可以出现在前端，但必须配置精确 Origin。服务端、�
 | 模块 | 状态 |
 | --- | --- |
 | Web 控制台与服务端 | 可自托管，持续完善 |
-| Browser SDK | 已发布 `0.1.1` |
+| Browser SDK | 已发布 `0.2.0` |
 | Vite Source Map 插件 | 预览，尚未公开发布 |
 | Node SDK | 计划中 |
 | Python SDK | 预览，尚未发布到 PyPI |

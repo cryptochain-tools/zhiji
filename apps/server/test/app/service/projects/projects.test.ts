@@ -80,6 +80,22 @@ describe('ProjectsDomainService', () => {
     )
   })
 
+  it('keeps an enabled behavior page allowlist inside the project page boundary', async () => {
+    const store = new MemoryProjectStore()
+    const service = new ProjectsDomainService(store)
+    const behavior = { enabled: true, policy_version: 1, page_allowlist: [ '/orders/:orderId' ], track_ids: [], block_selectors: [], sample_rate: 1 }
+    const project = await service.create(owner, { name: 'Behavior', page_capture: { allowed_page_keys: [ '/pricing' ], route_templates: [ '/orders/:orderId' ] }, behavior_capture: behavior })
+    assert.deepEqual(project.behavior_capture, behavior)
+    await assert.rejects(
+      service.update(owner, project.id, { behavior_capture: { ...behavior, policy_version: 2, page_allowlist: [ '/checkout' ] } }),
+      (error: Error & { code?: string }) => error.code === 'invalid_policy',
+    )
+    await assert.rejects(
+      service.update(owner, project.id, { page_capture: { allowed_page_keys: [ '/pricing' ], route_templates: [] } }),
+      (error: Error & { code?: string }) => error.code === 'invalid_policy',
+    )
+  })
+
   it('persists a complete lifecycle override but never exposes a longer fixed raw-data period', async () => {
     const store = new MemoryProjectStore(); const service = new ProjectsDomainService(store)
     const project = await service.create(owner, { name: 'Lifecycle', policy: { data_lifecycle_policy: { raw_event_days: 730, error_occurrence_days: 365, behavior_raw_days: 365, replay_raw_days: 365, performance_raw_days: 365, aggregate_days: 730, backup_expiry_days: 90 } } })

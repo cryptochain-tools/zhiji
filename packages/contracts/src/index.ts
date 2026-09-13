@@ -41,6 +41,7 @@ export interface SdkConfig {
   cache_max_age_seconds: number
   page_rules: {
     allowed_page_keys: string[]
+    route_templates: string[]
   }
   behavior_capture: BrowserBehaviorCapturePolicy
   session_replay: BrowserCapturePolicy & {

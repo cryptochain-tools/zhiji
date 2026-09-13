@@ -23,6 +23,18 @@ describe('BrowserProjectKeyResolver', () => {
     const invalid: DatabaseClient = { async query<Row extends object>(): Promise<QueryResult<Row>> { return { rows: [{ ...row, page_capture: { allowed_page_keys: 'wrong', route_templates: [] } } as Row], rowCount: 1 } } }
     assert.equal(await new BrowserProjectKeyResolver(invalid).resolve('zj_bro_secret-value'), null)
   })
+
+  it('allows automatic click capture without configured element track IDs', async () => {
+    const automatic = {
+      project_key_id: '00000000-0000-4000-8000-000000000003', tenant_id: '00000000-0000-4000-8000-000000000001', project_id: '00000000-0000-4000-8000-000000000002',
+      allowed_origins: [ 'https://app.example.com' ], page_capture: { allowed_page_keys: [ '/pricing' ], route_templates: [] },
+      behavior_capture: { enabled: true, policy_version: 1, page_allowlist: [ '/pricing' ], track_ids: [], block_selectors: [], sample_rate: 1 }, session_replay: { enabled: false, policy_version: 1 }, performance_capture: { enabled: false, policy_version: 1 },
+    }
+    const database: DatabaseClient = { async query<Row extends object>(): Promise<QueryResult<Row>> { return { rows: [ automatic as Row ], rowCount: 1 } } }
+    const resolved = await new BrowserProjectKeyResolver(database).resolve('zj_bro_secret-value')
+    assert.equal(resolved?.capture.behavior, true)
+    assert.deepEqual(resolved?.capture.behaviorPolicy.trackIds, [])
+  })
 })
 
 describe('ServerProjectKeyResolver', () => {

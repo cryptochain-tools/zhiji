@@ -7,6 +7,118 @@ import { PerformanceCollector } from "../.test-dist/performance.js";
 import { ReplayRecorder } from "../.test-dist/replay.js";
 import { sanitizePageKey, sanitizeProperties } from "../.test-dist/privacy.js";
 import { ZhijiClient } from "../.test-dist/sdk.js";
+import { initFromConfig } from "../.test-dist/config.js";
+
+const sdkConfig = (overrides = {}) => ({
+  data: {
+    project_id: "project-1",
+    policy_version: 7,
+    cache_max_age_seconds: 60,
+    page_rules: { allowed_page_keys: ["/home"], route_templates: ["/orders/:orderId"] },
+    behavior_capture: { enabled: true, policy_version: 3, page_allowlist: ["/home"], track_ids: ["save"], block_selectors: ["[data-private]"], sample_rate: 0.5 },
+    session_replay: { enabled: true, policy_version: 2, sample_rate: 0.5, page_allowlist: ["/home"], max_session_seconds: 60, max_session_bytes: 4096 },
+    performance_capture: { enabled: true, policy_version: 1 },
+    ...overrides,
+  },
+  meta: { request_id: "request-1" },
+});
+
+test("initFromConfig loads the public envelope and applies its origin to ingest endpoints", async () => {
+  const requested = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    requested.push({ url: String(url), init });
+    return String(url).endsWith("/api/sdk/config")
+      ? new Response(JSON.stringify(sdkConfig()), { status: 200 })
+      : new Response(JSON.stringify({ data: { accepted: 1, duplicate: 0, sampled: 0, rate_limited: 0, dropped: 0 } }), { status: 200 });
+  };
+  const client = await initFromConfig({
+    key: "zj_pk_test", origin: "https://zhiji.example.test", capturePageViews: false,
+    behaviorCapture: { trackIds: ["save", "not-allowed"], sampleRate: 0.8 }, performance: true,
+  });
+  try {
+    assert.deepEqual(requested, [{ url: "https://zhiji.example.test/api/sdk/config", init: { method: "GET", headers: { "X-Zhiji-Key": "zj_pk_test" }, credentials: "omit" } }]);
+    client.track("page_loaded", undefined, { pageKey: "/home" });
+    await client.flush(["analytics"]);
+    assert.equal(requested[1].url, "https://zhiji.example.test/api/ingest/events");
+    assert.equal(JSON.parse(requested[1].init.body).events[0].route, "/home");
+  } finally { client.destroy(); globalThis.fetch = originalFetch; }
+});
+
+test("initFromConfig keeps config and ingest requests same-origin when origin is omitted", async () => {
+  const requested = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    requested.push(String(url));
+    return String(url) === "/api/sdk/config"
+      ? new Response(JSON.stringify(sdkConfig()), { status: 200 })
+      : new Response(JSON.stringify({ data: { accepted: 1, duplicate: 0, sampled: 0, rate_limited: 0, dropped: 0 } }), { status: 200 });
+  };
+  const client = await initFromConfig({ key: "zj_pk_test", capturePageViews: false });
+  try {
+    client.track("page_loaded", undefined, { pageKey: "/home" });
+    await client.flush(["analytics"]);
+    assert.deepEqual(requested, ["/api/sdk/config", "/api/ingest/events"]);
+  } finally { client.destroy(); globalThis.fetch = originalFetch; }
+});
+
+test("initFromConfig rejects failed or malformed public policies", async () => {
+  await assert.rejects(
+    () => initFromConfig({ key: "zj_pk_test", fetch: async () => new Response("denied", { status: 403 }) }),
+    /configuration request failed \(403\)/,
+  );
+  await assert.rejects(
+    () => initFromConfig({ key: "zj_pk_test", fetch: async () => new Response(JSON.stringify({ data: {} }), { status: 200 }) }),
+    /configuration response is invalid/,
+  );
+});
+
+test("initFromConfig never lets local replay or performance settings widen server policy", async () => {
+  const client = await initFromConfig({
+    key: "zj_pk_test", capturePageViews: false, replayCapture: { enabled: true, sampleRate: 1, pageAllowlist: ["/other"], maxSessionSeconds: 1000, maxSessionBytes: 10000 }, performance: true,
+    fetch: async () => new Response(JSON.stringify(sdkConfig({ session_replay: { enabled: true, policy_version: 2, sample_rate: 0.5, page_allowlist: ["/home"], max_session_seconds: 60, max_session_bytes: 4096 }, performance_capture: { enabled: false, policy_version: 1 } })), { status: 200 }),
+  });
+  try {
+    assert.equal(client["options"].replayCapture.enabled, false);
+    assert.equal(client["options"].performance, false);
+    assert.deepEqual(client["options"].privacy, { version: "7", pageKeys: ["/home"], routeTemplates: ["/orders/:orderId"] });
+  } finally { client.destroy(); }
+});
+
+test("initFromConfig enables marker-free click capture from a remote project policy", async () => {
+  const globals = snapshotGlobals(["window", "document", "location", "localStorage", "fetch"]);
+  const documentListeners = new Map();
+  const sent = [];
+  try {
+    Object.assign(globalThis, {
+      location: new URL("https://app.example.test/home"),
+      localStorage: { getItem: () => null, setItem: () => {} },
+      document: {
+        documentElement: { clientWidth: 1200, clientHeight: 800, scrollWidth: 1200, scrollHeight: 1600 },
+        body: { scrollWidth: 1200, scrollHeight: 1600 },
+        get cookie() { return ""; }, set cookie(_value) {},
+        addEventListener(name, listener) { documentListeners.set(name, listener); }, removeEventListener() {},
+      },
+      window: { history: { pushState() {}, replaceState() {} }, innerWidth: 1200, innerHeight: 800, scrollX: 0, scrollY: 0, addEventListener() {}, removeEventListener() {} },
+      fetch: async (url, init) => {
+        if (String(url).endsWith("/api/sdk/config")) return new Response(JSON.stringify(sdkConfig({
+          behavior_capture: { enabled: true, policy_version: 3, page_allowlist: ["/home"], track_ids: [], block_selectors: [], sample_rate: 1 },
+        })), { status: 200 });
+        sent.push({ url: String(url), body: JSON.parse(init.body) });
+        return new Response(JSON.stringify({ data: { accepted: 1, duplicate: 0, sampled: 0, rate_limited: 0, dropped: 0 } }), { status: 200 });
+      },
+    });
+    const client = await initFromConfig({ key: "zj_pk_test", origin: "https://zhiji.example.test", capturePageViews: false });
+    documentListeners.get("click")({ isTrusted: true, clientX: 12, clientY: 34, composedPath: () => [{ tagName: "BUTTON", getAttribute: () => null }] });
+    await client.flush(["behavior"]);
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0].url, "https://zhiji.example.test/api/ingest/behavior");
+    assert.deepEqual(sent[0].body.events.map(event => ({ action: event.action, page_key: event.page_key, element_token: event.element_token })), [
+      { action: "autocapture_click", page_key: "/home", element_token: undefined },
+    ]);
+    client.destroy();
+  } finally { restoreGlobals(globals); }
+});
 
 test("sanitizePageKey keeps only an approved stable key or template", () => {
   const policy = { version: "1", pageKeys: ["/home"], routeTemplates: ["/orders/:orderId"] };
@@ -94,12 +206,18 @@ test("SPA routing is observed and resource errors are ignored without a browser 
     location.pathname = "/next";
     history.pushState({}, "", "/next");
     await Promise.resolve();
+    location.pathname = "/outside";
+    history.pushState({}, "", "/outside");
+    await Promise.resolve();
+    location.pathname = "/home";
+    history.pushState({}, "", "/home");
+    await Promise.resolve();
     listeners.get("error")({ error: null, message: "" }); // resource-load shape
     listeners.get("error")({ error: new Error("boom"), message: "boom" });
     await client.flush();
     const analytics = sent.find((request) => request.events[0].kind === "event");
     const errors = sent.filter((request) => request.events[0].kind === "error");
-    assert.deepEqual(analytics.events.map((event) => event.route), ["/home", "/next"]);
+    assert.deepEqual(analytics.events.map((event) => event.route), ["/home", "/next", "/home"]);
     assert.equal(errors.flatMap((request) => request.events).length, 1);
     client.destroy();
   } finally {
@@ -140,7 +258,7 @@ test("an explicitly configured HTTPS endpoint can report to the hosted Zhiji dom
   }
 });
 
-test("autocapture emits only an allowlisted opaque token and never serializes DOM metadata", () => {
+test("autocapture records safe clicks without a marker, and never serializes DOM metadata", () => {
   const globals = snapshotGlobals(["window", "document", "location"]);
   const documentListeners = new Map();
   const windowListeners = new Map();
@@ -151,6 +269,16 @@ test("autocapture emits only an allowlisted opaque token and never serializes DO
   const masked = {
     tagName: "BUTTON",
     getAttribute(name) { return name === "data-zj-mask" ? "" : name === "data-zj-track-id" ? "save_button" : null; },
+  };
+  const unmarked = {
+    tagName: "BUTTON",
+    id: "account-123", className: "purchase-now", textContent: "Jane's private order",
+    getAttribute() { return null; },
+  };
+  const selectorBlocked = {
+    tagName: "BUTTON",
+    getAttribute() { return null; },
+    matches(selector) { return selector === "[data-private]"; },
   };
   Object.assign(globalThis, {
     location: new URL("https://app.example.test/home"),
@@ -169,23 +297,90 @@ test("autocapture emits only an allowlisted opaque token and never serializes DO
   const emitted = [];
   try {
     const collector = new BehaviorCollector({
-      capture: { enabled: true, trackIds: ["save_button"], actions: ["autocapture_click"] },
+      capture: { enabled: true, trackIds: ["save_button"], blockSelectors: ["[data-private]"], actions: ["autocapture_click"] },
       pageKey: () => "/home", pageVersion: () => "release-1", emit: (event) => emitted.push(event), debug: () => {},
     });
     const dispose = collector.install();
+    documentListeners.get("click")({ isTrusted: true, clientX: 5, clientY: 8, composedPath: () => [unmarked] });
     documentListeners.get("click")({ isTrusted: true, clientX: 25, clientY: 40, composedPath: () => [element] });
     documentListeners.get("click")({ isTrusted: true, clientX: 25, clientY: 40, composedPath: () => [masked] });
-    assert.equal(emitted.length, 1);
+    documentListeners.get("click")({ isTrusted: true, clientX: 25, clientY: 40, composedPath: () => [selectorBlocked] });
+    assert.equal(emitted.length, 2);
     assert.deepEqual(emitted[0], {
+      page_key: "/home", action: "autocapture_click", viewport_width: 1200, viewport_height: 800,
+      document_width: 1400, document_height: 2200, client_x: 5, client_y: 8, document_x: 15, document_y: 28,
+    });
+    assert.deepEqual(emitted[1], {
       page_key: "/home", action: "autocapture_click", viewport_width: 1200, viewport_height: 800,
       document_width: 1400, document_height: 2200, client_x: 25, client_y: 40, document_x: 35, document_y: 60, element_token: "save_button",
     });
-    assert.equal(JSON.stringify(emitted[0]).includes("tagName"), false);
-    assert.equal(JSON.stringify(emitted[0]).includes("class"), false);
+    assert.equal(JSON.stringify(emitted).includes("tagName"), false);
+    assert.equal(JSON.stringify(emitted).includes("class"), false);
+    assert.equal(JSON.stringify(emitted).includes("Jane"), false);
     dispose();
   } finally {
     restoreGlobals(globals);
   }
+});
+
+test("submit and change remain opt-in through an allowlisted track id", () => {
+  const globals = snapshotGlobals(["window", "document"]);
+  const listeners = new Map();
+  const sent = [];
+  const trackedForm = { tagName: "FORM", getAttribute(name) { return name === "data-zj-track-id" ? "save" : null; } };
+  const trackedInput = { tagName: "INPUT", getAttribute(name) { return name === "data-zj-track-id" ? "save" : null; } };
+  const untrackedInput = { tagName: "INPUT", getAttribute() { return null; } };
+  try {
+    Object.assign(globalThis, {
+      document: {
+        documentElement: { clientWidth: 0, clientHeight: 0, scrollWidth: 0, scrollHeight: 0 }, body: { scrollWidth: 0, scrollHeight: 0 },
+        addEventListener(name, listener) { listeners.set(name, listener); }, removeEventListener() {},
+      },
+      window: { innerWidth: 0, innerHeight: 0, addEventListener() {}, removeEventListener() {} },
+    });
+    const collector = new BehaviorCollector({
+      capture: { enabled: true, trackIds: ["save"], actions: ["autocapture_submit", "autocapture_change"] },
+      pageKey: () => "/home", pageVersion: () => undefined, emit: (event) => sent.push(event), debug: () => {},
+    });
+    const dispose = collector.install();
+    listeners.get("submit")({ isTrusted: true, composedPath: () => [untrackedInput] });
+    listeners.get("change")({ isTrusted: true, composedPath: () => [untrackedInput] });
+    listeners.get("submit")({ isTrusted: true, composedPath: () => [trackedForm] });
+    listeners.get("change")({ isTrusted: true, composedPath: () => [trackedInput] });
+    assert.deepEqual(sent.map(({ page_key, action, element_token, control_type }) => ({ page_key, action, element_token, ...(control_type ? { control_type } : {}) })), [
+      { page_key: "/home", action: "autocapture_submit", element_token: "save" },
+      { page_key: "/home", action: "autocapture_change", element_token: "save", control_type: "input" },
+    ]);
+    dispose();
+  } finally { restoreGlobals(globals); }
+});
+
+test("scroll depth state resets after SPA navigation", async () => {
+  const globals = snapshotGlobals(["window", "document", "requestAnimationFrame"]);
+  const windowListeners = new Map();
+  const emitted = [];
+  try {
+    Object.assign(globalThis, {
+      document: {
+        documentElement: { clientWidth: 1200, clientHeight: 800, scrollWidth: 1200, scrollHeight: 1600, scrollTop: 0 },
+        body: { scrollWidth: 1200, scrollHeight: 1600 }, addEventListener() {}, removeEventListener() {},
+      },
+      window: { innerWidth: 1200, innerHeight: 800, scrollY: 0, addEventListener(name, listener) { windowListeners.set(name, listener); }, removeEventListener() {} },
+      requestAnimationFrame: undefined,
+    });
+    const collector = new BehaviorCollector({
+      capture: { enabled: true, actions: ["scroll_depth"] }, pageKey: () => "/home", pageVersion: () => undefined,
+      emit: (event) => emitted.push(event), debug: () => {},
+    });
+    const dispose = collector.install();
+    windowListeners.get("scroll")();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    windowListeners.get("popstate")();
+    windowListeners.get("scroll")();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.deepEqual(emitted.map(event => event.depth_bucket), [25, 50, 25, 50]);
+    dispose();
+  } finally { restoreGlobals(globals); }
 });
 
 test("server behavior policy can only be narrowed locally", () => {
@@ -194,6 +389,10 @@ test("server behavior policy can only be narrowed locally", () => {
     { enabled: true, pageAllowlist: ["/safe", "/other"], trackIds: ["save", "other"], blockSelectors: ["[data-local-block]"], sampleRate: 0.8, actions: ["autocapture_click"] },
   );
   assert.deepEqual(capture, { enabled: true, pageAllowlist: ["/safe"], trackIds: ["save"], blockSelectors: [".sensitive", "[data-local-block]"], sampleRate: 0.5, actions: ["autocapture_click"] });
+  assert.equal(narrowBehaviorCapture(
+    { enabled: true, policy_version: 3, page_allowlist: ["/safe"], track_ids: [], block_selectors: [], sample_rate: 1 },
+    { actions: ["autocapture_click", "scroll_depth"] },
+  ).enabled, true);
   assert.equal(narrowBehaviorCapture(undefined, { enabled: true, trackIds: ["save"] }).enabled, false);
 });
 

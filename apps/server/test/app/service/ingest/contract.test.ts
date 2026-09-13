@@ -59,6 +59,21 @@ describe('ingest contract', () => {
       client_x: 400, client_y: 300, document_x: 400, document_y: 1700, click_count: 3, element_token: 'save_button',
     }] }, options)
     assert.equal(result.lane, 'behavior')
+    const coordinateOnly = validateIngest('behavior', { key: 'zj_pk', events: [{
+      client_event_id: id, kind: 'behavior', visitor_id: 'visitor_a', occurred_at: now.toISOString(), page_key: '/pricing',
+      action: 'autocapture_click', viewport_width: 1280, viewport_height: 800, document_width: 1280, document_height: 2400,
+      client_x: 410, client_y: 310, document_x: 410, document_y: 1710,
+    }] }, options)
+    assert.equal(coordinateOnly.lane, 'behavior')
+    if (coordinateOnly.lane === 'behavior') assert.equal(coordinateOnly.events[0]?.element_token, undefined)
+    for (const action of ['autocapture_submit', 'autocapture_change', 'rage_click', 'dead_click'] as const) {
+      assert.throws(() => validateIngest('behavior', { key: 'zj_pk', events: [{
+        client_event_id: id, kind: 'behavior', visitor_id: 'visitor_a', occurred_at: now.toISOString(), page_key: '/pricing', action,
+        ...(action === 'autocapture_change' ? { control_type: 'input' } : {}),
+        ...(action === 'rage_click' ? { click_count: 3 } : {}),
+        ...(action === 'dead_click' ? { dead_click_heuristic: 'no_navigation_or_interaction_v1' } : {}),
+      }] }, options), IngestContractError)
+    }
     assert.throws(() => validateIngest('behavior', { key: 'zj_pk', events: [{
       client_event_id: id, kind: 'behavior', visitor_id: 'visitor_a', occurred_at: now.toISOString(), page_key: '/pricing', action: 'autocapture_click', element_key: 'button',
     }] }, options), IngestContractError)

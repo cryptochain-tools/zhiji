@@ -72,6 +72,20 @@ test('tenant lifecycle defaults use the tenant-scoped settings endpoint', async 
   } finally { globalThis.fetch = originalFetch }
 })
 
+test('project updates preserve the complete behavior capture policy', async () => {
+  const originalFetch = globalThis.fetch
+  const calls: Array<{ url: string; method: string; body: string }> = []
+  const behavior = { enabled: true, policy_version: 4, page_allowlist: [ '/', '/checkout' ], track_ids: [ 'checkout-submit' ], block_selectors: [ '[data-private]' ], sample_rate: 0.5 }
+  globalThis.fetch = async (input, init) => {
+    calls.push({ url: String(input), method: init?.method ?? 'GET', body: String(init?.body ?? '') })
+    return new Response(JSON.stringify({ data: { project: {} } }), { status: 200, headers: { 'content-type': 'application/json' } })
+  }
+  try {
+    await new ApiClient('https://api.example.test').updateProject('tenant/a', 'project b', { behavior_capture: behavior })
+    assert.deepEqual(calls, [{ url: 'https://api.example.test/api/tenants/tenant%2Fa/projects/project%20b', method: 'PATCH', body: JSON.stringify({ behavior_capture: behavior }) }])
+  } finally { globalThis.fetch = originalFetch }
+})
+
 test('direct member creation is tenant-scoped and sends only account fields', async () => {
   const originalFetch = globalThis.fetch
   const calls: Array<{ url: string; method: string; body: string }> = []

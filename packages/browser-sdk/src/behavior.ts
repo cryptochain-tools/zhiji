@@ -9,7 +9,7 @@ interface BehaviorCollectorOptions {
 }
 
 interface ClickRecord { token: string; at: number; count: number; }
-interface AllowedTarget { element: ElementLike; token: string; controlType?: "input" | "select" | "textarea"; }
+interface TrackedTarget { token: string; controlType?: "input" | "select" | "textarea"; }
 
 const DEFAULT_ACTIONS: readonly BehaviorAction[] = ["autocapture_click", "autocapture_submit", "autocapture_change", "scroll_depth", "rage_click", "dead_click"];
 const DEPTH_BUCKETS = [25, 50, 75, 100] as const;
@@ -17,8 +17,9 @@ const DEAD_CLICK_DELAY_MS = 800;
 
 /**
  * Privacy-first delegated interaction collector. It intentionally never reads
- * text, HTML, ids, classes, names, aria labels, input values, or selectors for
- * transmission. `data-zj-track-id` is used only locally to decide eligibility.
+ * text, HTML, ids, classes, names, aria labels, or input values. On allowed
+ * pages, safe trusted clicks are captured as coordinates only. An allowlisted
+ * `data-zj-track-id` is optional and is used only to attach an opaque token.
  */
 export class BehaviorCollector {
   private readonly actions: ReadonlySet<BehaviorAction>;
@@ -46,7 +47,7 @@ export class BehaviorCollector {
     const submit = (event: Event) => this.onInteraction(event, "autocapture_submit");
     const change = (event: Event) => this.onInteraction(event, "autocapture_change");
     const scroll = () => this.scheduleScroll();
-    const route = () => { this.navigationEpoch += 1; };
+    const route = () => this.resetPageState();
     document.addEventListener("click", click, true);
     document.addEventListener("submit", submit, true);
     document.addEventListener("change", change, true);
@@ -72,17 +73,34 @@ export class BehaviorCollector {
     };
   }
 
-  public markNavigation(): void { this.navigationEpoch += 1; }
+  public markNavigation(): void { this.resetPageState(); }
+
+  private resetPageState(): void {
+    this.navigationEpoch += 1;
+    this.clickRecords.splice(0);
+    this.sentDepths.clear();
+  }
 
   private onInteraction(event: Event, action: Extract<BehaviorAction, "autocapture_click" | "autocapture_submit" | "autocapture_change">): void {
     if (!this.actions.has(action) || !trusted(event)) return;
-    const target = this.allowedTarget(event);
-    if (!target) return;
+    const elements = eventPath(event);
+    if (elements.some((item) => blocked(item, this.options.capture.blockSelectors))) return;
+    const target = this.trackedTarget(elements);
+    // Click heatmaps intentionally do not require an element annotation. Form
+    // interactions remain explicit because their semantics can be sensitive.
+    if (action !== "autocapture_click" && !target) return;
     this.interactionEpoch += 1;
     const point = action === "autocapture_click" ? eventPoint(event) : undefined;
-    this.emit(action, { ...dimensions(), ...point, element_token: target.token, ...(action === "autocapture_change" && target.controlType ? { control_type: target.controlType } : {}) });
+    this.emit(action, {
+      ...dimensions(),
+      ...point,
+      ...(target ? { element_token: target.token } : {}),
+      ...(action === "autocapture_change" && target?.controlType ? { control_type: target.controlType } : {}),
+    });
     if (action !== "autocapture_click") return;
-    this.trackClick(target.token, point);
+    // Without an explicit token we deliberately do not derive rage/dead-click
+    // identities from DOM metadata or coordinate fingerprints.
+    if (target) this.trackClick(target.token, point);
   }
 
   private trackClick(token: string, point: Coordinates | undefined): void {
@@ -136,10 +154,7 @@ export class BehaviorCollector {
     } catch { this.options.debug("collector_failure"); }
   }
 
-  private allowedTarget(event: Event): AllowedTarget | undefined {
-    const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
-    const elements = path.filter(isElementLike);
-    if (elements.some((item) => blocked(item, this.options.capture.blockSelectors))) return undefined;
+  private trackedTarget(elements: readonly ElementLike[]): TrackedTarget | undefined {
     const element = elements.find((item) => {
       const token = attribute(item, "data-zj-track-id");
       return token !== null && this.trackIds.has(token);
@@ -147,7 +162,8 @@ export class BehaviorCollector {
     if (!element) return undefined;
     const token = attribute(element, "data-zj-track-id");
     if (!token) return undefined;
-    return { element, token, ...(controlType(element) ? { controlType: controlType(element)! } : {}) };
+    const type = controlType(element);
+    return { token, ...(type ? { controlType: type } : {}) };
   }
 }
 
@@ -168,7 +184,9 @@ export function narrowBehaviorCapture(server: BehaviorCapturePolicy | undefined,
   const sampleRate = Math.min(server.sample_rate, validSampleRate(local?.sampleRate) ? local!.sampleRate! : server.sample_rate);
   const blockSelectors = [...new Set([...(server.block_selectors ?? []), ...(local?.blockSelectors ?? [])])].filter(selector => typeof selector === 'string' && selector.length > 0 && selector.length <= 200 && !/[\n\r]/.test(selector));
   const actions = (local?.actions ?? DEFAULT_ACTIONS).filter(isAction);
-  return { enabled: sampleRate > 0 && trackIds.length > 0 && pageAllowlist.length > 0 && actions.length > 0, sampleRate, trackIds, blockSelectors, pageAllowlist, actions };
+  // Track IDs gate only semantic form events and optional element tokens. They
+  // must never turn off coordinate-only clicks or scroll-depth collection.
+  return { enabled: sampleRate > 0 && pageAllowlist.length > 0 && actions.length > 0, sampleRate, trackIds, blockSelectors, pageAllowlist, actions };
 }
 
 function isAction(value: string): value is BehaviorAction { return (DEFAULT_ACTIONS as readonly string[]).includes(value); }
@@ -181,6 +199,10 @@ function validSampleRate(value: number | undefined): value is number { return ty
 function sample(rate: number): boolean { return rate >= 1 || (rate > 0 && Math.random() < rate); }
 function trusted(event: Event): boolean { return event.isTrusted !== false; }
 function isElementLike(value: EventTarget | null): value is ElementLike { return !!value && typeof value === "object" && typeof (value as ElementLike).tagName === "string"; }
+function eventPath(event: Event): ElementLike[] {
+  const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+  return path.filter(isElementLike);
+}
 interface ElementLike extends EventTarget { tagName: string; getAttribute?: (name: string) => string | null; matches?: (selector: string) => boolean; }
 function attribute(element: ElementLike, name: string): string | null { try { return element.getAttribute?.(name) ?? null; } catch { return null; } }
 function blocked(element: ElementLike, selectors: readonly string[] | undefined): boolean {

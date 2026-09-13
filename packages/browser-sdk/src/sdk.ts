@@ -163,7 +163,13 @@ export class ZhijiClient {
 
   private capturePageView = (): void => {
     const pageKey = this.pageKey();
-    if (!pageKey || pageKey === this.lastPageKey) return;
+    if (!pageKey) {
+      // Leaving the configured page boundary must not suppress a later return
+      // to a previously visited allowed page.
+      this.lastPageKey = undefined;
+      return;
+    }
+    if (pageKey === this.lastPageKey) return;
     this.lastPageKey = pageKey;
     this.track("page_view", undefined, { pageKey });
   };

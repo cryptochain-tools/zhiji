@@ -175,7 +175,7 @@ function behaviorCapturePolicy(value: unknown): IngestProject['capture']['behavi
   const trackIds = stringArray(value.track_ids, 500, entry => /^[A-Za-z0-9_-]{1,128}$/.test(entry))
   const blocks = stringArray(value.block_selectors, 500, entry => entry.length >= 1 && entry.length <= 200 && !/[\n\r]/.test(entry))
   if (!pageAllowlist || !trackIds || !blocks) return null
-  if (value.enabled && (pageAllowlist.length === 0 || trackIds.length === 0 || value.sample_rate <= 0)) return null
+  if (value.enabled && (pageAllowlist.length === 0 || value.sample_rate <= 0)) return null
   return { enabled: value.enabled, policyVersion: value.policy_version, pageAllowlist, trackIds, sampleRate: value.sample_rate }
 }
 

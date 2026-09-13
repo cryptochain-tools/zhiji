@@ -21,14 +21,18 @@ export default class SdkConfigController extends Controller {
   async show() {
     const { ctx } = this
     const key = ctx.get('x-zhiji-key')
-    const origin = ctx.get('origin')
+    // Browsers commonly omit Origin on same-origin GET requests. In that case
+    // the request target is the calling origin; the configured project
+    // allowlist still decides whether it is accepted.
+    const requestOrigin = ctx.get('origin')
+    const origin = requestOrigin || ctx.origin
     const result = await ctx.service.sdkConfig.get({
       key,
       origin,
       ifNoneMatch: ctx.get('if-none-match') || undefined,
     })
 
-    this.setCorsHeaders(origin)
+    if (requestOrigin) this.setCorsHeaders(origin)
     ctx.set('Cache-Control', `private, max-age=${result.maxAge}`)
     ctx.set('ETag', result.etag)
     if (ctx.get('if-none-match') === result.etag) {

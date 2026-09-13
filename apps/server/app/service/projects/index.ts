@@ -146,8 +146,16 @@ function validateBehaviorCapturePolicy(policy: unknown) {
   if (typeof value.sample_rate !== 'number' || !Number.isFinite(value.sample_rate) || value.sample_rate < 0 || value.sample_rate > 1) {
     throw httpError(400, 'invalid_policy', 'behavior_capture.sample_rate is invalid')
   }
-  if (value.enabled && (pages.length === 0 || value.track_ids.length === 0 || value.sample_rate <= 0)) {
-    throw httpError(400, 'invalid_policy', 'enabled behavior_capture requires pages, track IDs, and a positive sample rate')
+  if (value.enabled && (pages.length === 0 || value.sample_rate <= 0)) {
+    throw httpError(400, 'invalid_policy', 'enabled behavior_capture requires pages and a positive sample rate')
+  }
+}
+
+function validateBehaviorPageScope(policy: BehaviorCapturePolicy, pageCapture: PageCapturePolicy) {
+  if (!policy.enabled) return
+  const allowedPages = new Set([ ...pageCapture.allowed_page_keys, ...pageCapture.route_templates ])
+  if (policy.page_allowlist.some(page => !allowedPages.has(page))) {
+    throw httpError(400, 'invalid_policy', 'behavior_capture.page_allowlist must stay within page_capture')
   }
 }
 
@@ -244,6 +252,7 @@ export class ProjectsDomainService {
       created_at: new Date(),
     }
     validateBehaviorCapturePolicy(record.behavior_capture)
+    validateBehaviorPageScope(record.behavior_capture, record.page_capture)
     validateCapturePolicy(record.session_replay, 'session_replay')
     validateCapturePolicy(record.performance_capture, 'performance_capture')
     await this.assertRetentionLimit(scope.tenantId, record.retention_days, record.data_lifecycle_policy)
@@ -272,6 +281,7 @@ export class ProjectsDomainService {
       policy_version: current.policy_version + 1,
     }
     validateBehaviorCapturePolicy(next.behavior_capture)
+    validateBehaviorPageScope(next.behavior_capture, next.page_capture)
     validateCapturePolicy(next.session_replay, 'session_replay')
     validateCapturePolicy(next.performance_capture, 'performance_capture')
     await this.assertRetentionLimit(scope.tenantId, next.retention_days, next.data_lifecycle_policy)

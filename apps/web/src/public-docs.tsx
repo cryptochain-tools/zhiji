@@ -58,7 +58,7 @@ function DocsIndex({ Link }: { Link: ComponentType<LinkProps> }) {
     <section className="pub-docs-wrap pub-docs-index-body" aria-label="文档目录">
       <div className="pub-docs-start"><span>推荐从这里开始</span><Link href="/docs/quickstart">浏览器快速开始 <b>→</b></Link></div>
       <aside className="pub-docs-open-source" aria-label="开源发布状态">
-        <div><p>开放源码</p><h2>先从已发布的 Browser SDK 开始。</h2><span>当前版本 <b>@zhiji-labs/browser-sdk 0.1.1</b>；Node、React Native 与 Python SDK 均为计划中，尚未提供可安装的公开包。</span></div>
+        <div><p>开放源码</p><h2>先从已发布的 Browser SDK 开始。</h2><span>当前版本 <b>@zhiji-labs/browser-sdk 0.2.0</b>；Node、React Native 与 Python SDK 均为计划中，尚未提供可安装的公开包。</span></div>
         <div className="pub-docs-open-source-links"><a href="https://github.com/earntools-labs/zhiji" target="_blank" rel="noreferrer">查看 GitHub <b aria-hidden="true">↗</b></a><Link href="/self-hosting">了解自部署</Link><small>平台采用 AGPL-3.0；SDK 与 Vite 插件按各目录中的 MIT License 发布。</small></div>
       </aside>
       {navigation.map(section => {
@@ -98,11 +98,12 @@ const docs: Record<Exclude<PublicPage, 'docs'>, ArticleData> = {
     group: '开始使用', title: '快速开始', lead: '用一个事件完成最小接入。开始前，请在管理台创建项目，并只允许你实际使用的站点 Origin。', reading: '约 5 分钟', next: ['身份关联', '/docs/identity'],
     sections: [
       { id: 'before', title: '开始前准备', body: <><p>一个项目对应一组采集规则。先在管理台创建项目，添加精确 Origin，例如 <InlineCode>https://app.example.com</InlineCode>。不要填写通配符、路径或带参数的网址。</p><p>随后创建浏览器 Key。它是公开的写入标识，适合放在前端；它不能读取管理数据，也不能替代登录凭据。</p></> },
-      { id: 'initialize', title: '初始化浏览器 SDK', body: <><p>安装公开的 Browser SDK，导入后传入 Key 和 release；默认会向当前站点的 <InlineCode>/api/ingest/*</InlineCode> 提交数据。</p><Code>{`import { init } from '@zhiji-labs/browser-sdk'
+      { id: 'initialize', title: '初始化浏览器 SDK', body: <><p>安装公开的 Browser SDK，导入后传入 Key、知迹服务地址和 release；SDK 会读取项目公开策略，并只在允许页面启用相应采集。</p><Code>{`import { initFromConfig } from '@zhiji-labs/browser-sdk'
 
-const zhiji = init({
+const zhiji = await initFromConfig({
   key: 'zj_pk_your_project_key',
-  release: '2026.09.12',
+  origin: 'https://zhiji.example.com',
+  release: '2026.09.13',
 })`}</Code></> },
       { id: 'track', title: '发送第一条事件', body: <><p>事件名使用稳定、可读的动作，例如用户打开价格页。属性只包含已在项目规则中允许的低敏感字段。</p><Code>{`zhiji.track('pricing_viewed', {
   plan: 'pro',
@@ -127,11 +128,19 @@ try {
 } catch (error) {
   zhiji.captureException(error)
 }`}</Code></> },
-      { id: 'optional', title: '按策略开启体验采集', body: <><p>行为、回放和性能不是初始化后的默认动作。它们只有在项目策略允许且客户端显式打开时才运行。回放记录的是经过净化的交互时间线，不会录制完整 DOM 或输入值。</p><Code>{`const zhiji = init({
+      { id: 'optional', title: '按策略开启体验采集', body: <><p>使用 <InlineCode>initFromConfig</InlineCode> 先加载项目公开策略，再由客户端选择需要进一步收紧的行为、回放和性能采集。行为采集会在允许页面自动汇总普通点击坐标，不采集 DOM、页面文本或输入值；用项目中的 block selector 排除敏感区域。回放记录的是经过净化的交互时间线，不会录制完整 DOM 或输入值。</p><Code>{`import { initFromConfig } from '@zhiji-labs/browser-sdk'
+
+const zhiji = await initFromConfig({
   key: 'zj_pk_your_project_key',
+  origin: 'https://zhiji.example.com',
   performance: true,
   replayCapture: { enabled: true, sampleRate: 0.1 },
-})`}</Code><Note>客户端选项只能收紧服务端策略，不能绕过项目的页面、采样或隐私限制。</Note></> },
+})
+
+// 可选：为已在项目设置中登记的关键元素添加稳定标识。
+// submit / change 等表单交互必须显式使用 track-id。
+// 不要把姓名、邮箱、订单号或自由文本放进 track-id。
+document.querySelector('button')?.setAttribute('data-zj-track-id', 'checkout-submit')`}</Code><Note>客户端选项只能收紧服务端策略，不能绕过项目的页面、采样或隐私限制。</Note></> },
       { id: 'identity', title: '登录与退出', body: <p>业务登录成功后，由你的服务端签发短期 identity assertion，再调用 <InlineCode>login</InlineCode>。SDK 不会自行声称任意业务用户。退出时调用 <InlineCode>logout()</InlineCode>，它只清除当前业务用户关联，匿名 visitor 保持稳定。</p> },
     ],
   },
@@ -205,7 +214,7 @@ zhiji.logout()`}</Code></> },
   changelog: {
     group: '部署与参考', title: '变更记录', lead: '每一次影响接入方式或数据语义的变化，都会在这里说明兼容性与迁移建议。', reading: '约 2 分钟', previous: ['部署与运维', '/docs/operations'],
     sections: [
-      { id: 'latest', title: '2026-09-12 · Browser SDK 0.1.1', body: <div className="pub-docs-release"><span>0.1.1</span><div><b>发布 @zhiji-labs/browser-sdk</b><p>提供受限的浏览器事件、错误、行为、回放和性能采集能力；Node、React Native 与 Python SDK 仍为计划中。</p></div></div> },
+      { id: 'latest', title: '2026-09-13 · Browser SDK 0.2.0', body: <div className="pub-docs-release"><span>0.2.0</span><div><b>支持远程策略初始化与全埋点点击采集</b><p>新增 <InlineCode>initFromConfig</InlineCode>，自动读取项目页面与隐私策略；允许页面的普通点击无需逐个添加 track-id，表单语义事件仍需显式白名单。</p></div></div> },
       { id: 'compatibility', title: '兼容原则', body: <p>同一主版本中，只新增可选字段或修复不改变既有行为的问题。必填字段、通道语义或身份规则发生变化时，会创建新主版本并提供迁移说明。</p> },
       { id: 'status', title: '当前状态', body: <Note>当前文档描述正在使用的接口形状与 SDK 能力。新的公开发布会在这里列出版本、变更范围与适用的迁移步骤。</Note> },
     ],

@@ -146,7 +146,7 @@ function validateBehavior(value: Record<string, unknown>, common: ReturnType<typ
   if (action === 'rage_click' && clicks === undefined) throw invalid('click_count', index)
   if (action !== 'rage_click' && clicks !== undefined) throw invalid('click_count', index)
   if (action === 'scroll_depth' && (elementToken !== undefined || controlType !== undefined || deadClickHeuristic !== undefined)) throw invalid('behavior_details', index)
-  if (action !== 'scroll_depth' && elementToken === undefined) throw invalid('element_token', index)
+  if (!['autocapture_click', 'scroll_depth'].includes(action) && elementToken === undefined) throw invalid('element_token', index)
   if (action === 'autocapture_change' && controlType === undefined) throw invalid('control_type', index)
   if (action !== 'autocapture_change' && controlType !== undefined) throw invalid('control_type', index)
   if (action === 'dead_click' && deadClickHeuristic === undefined) throw invalid('dead_click_heuristic', index)

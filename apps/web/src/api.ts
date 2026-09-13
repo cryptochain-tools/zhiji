@@ -1,5 +1,5 @@
-import type { ApiFailure, ApiSuccess, CapturePolicy, DataLifecyclePolicy, ManagementProject, ManagementProjectInput, PageCapturePolicy, ProjectPolicyValue, TenantDefaultsInput, TenantDefaultsResponse } from '@zhiji/contracts'
-export type { CapturePolicy, DataLifecyclePolicy, PageCapturePolicy, ProjectPolicyValue, TenantDefaultsInput, TenantDefaultsResponse } from '@zhiji/contracts'
+import type { ApiFailure, ApiSuccess, BehaviorCapturePolicy, CapturePolicy, DataLifecyclePolicy, ManagementProject, ManagementProjectInput, PageCapturePolicy, ProjectPolicyValue, TenantDefaultsInput, TenantDefaultsResponse } from '@zhiji/contracts'
+export type { BehaviorCapturePolicy, CapturePolicy, DataLifecyclePolicy, PageCapturePolicy, ProjectPolicyValue, TenantDefaultsInput, TenantDefaultsResponse } from '@zhiji/contracts'
 
 export class ApiError extends Error {
   constructor(public readonly status: number, public readonly code: string, message: string, public readonly requestId?: string) {
@@ -10,14 +10,11 @@ export class ApiError extends Error {
 export interface Tenant { id: string; name: string; role: 'owner' | 'admin' | 'member' | 'viewer' }
 export interface TenantMember { user_id: string; email: string; display_name: string; role: Tenant['role']; all_projects: boolean; project_ids: string[] }
 export interface Viewer { id: string; email: string; display_name: string; tenants: Tenant[] }
-/** Console only toggles capture switches; complete policy data remains server-owned. */
-export interface Project extends Omit<ManagementProject, 'behavior_capture' | 'session_replay' | 'performance_capture'> {
-  behavior_capture: CapturePolicy
+export interface Project extends Omit<ManagementProject, 'session_replay' | 'performance_capture'> {
   session_replay: CapturePolicy
   performance_capture: CapturePolicy
 }
-export type ConsoleProjectUpdate = Omit<ManagementProjectInput, 'behavior_capture' | 'session_replay' | 'performance_capture'> & {
-  behavior_capture?: CapturePolicy
+export type ConsoleProjectUpdate = Omit<ManagementProjectInput, 'session_replay' | 'performance_capture'> & {
   session_replay?: CapturePolicy
   performance_capture?: CapturePolicy
 }

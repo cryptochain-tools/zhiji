@@ -72,6 +72,15 @@ describe('PostgreSqlIngestWriter', () => {
     assert.ok(database.operations.some(operation => operation.text.includes('INSERT INTO heatmap_bins_daily')))
   })
 
+  it('stores coordinate-only automatic clicks without requiring an element-key secret', async () => {
+    const database = new RecordingDatabase()
+    const payload = validateIngest('behavior', { key: 'zj_bro_key', events: [{ client_event_id: eventId, kind: 'behavior', visitor_id: 'visitor', occurred_at: now.toISOString(), page_key: '/pricing', page_version: 'r1', action: 'autocapture_click', viewport_width: 1200, viewport_height: 800, document_width: 1200, document_height: 1600, client_x: 20, client_y: 30, document_x: 20, document_y: 30 }] }, { now, pagePolicy: { allowedPageKeys: [ '/pricing' ], routeTemplates: [] } })
+    await new PostgreSqlIngestWriter(database).write({ scope, lane: 'behavior', payload, behaviorPolicyVersion: 2, clientEventIds: [ eventId ] })
+    const behavior = database.operations.find(operation => operation.text.includes('INSERT INTO behavior_events'))
+    assert.equal(behavior?.values?.[10], null)
+    assert.ok(database.operations.some(operation => operation.text.includes('INSERT INTO heatmap_bins_daily')))
+  })
+
   it('rejects replay before a receipt when private storage is absent', async () => {
     const payload = replayPayload()
     const database = new RecordingDatabase()
