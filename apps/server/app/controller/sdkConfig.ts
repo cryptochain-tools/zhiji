@@ -1,5 +1,6 @@
 import { Controller } from 'egg'
-import { success } from '../lib/http'
+import { httpError, success } from '../lib/http'
+import { normalizeOrigin } from '../service/sdkConfig'
 
 export default class SdkConfigController extends Controller {
   private setCorsHeaders(origin: string) {
@@ -12,8 +13,11 @@ export default class SdkConfigController extends Controller {
 
   async preflight() {
     const { ctx } = this
-    const origin = ctx.get('origin')
-    await ctx.service.sdkConfig.get({ key: ctx.get('x-zhiji-key'), origin })
+    // A CORS preflight never includes the requested X-Zhiji-Key value. It only
+    // declares that the actual request intends to use that header. Validate the
+    // caller shape here, then authenticate the key and project Origin on GET.
+    const origin = normalizeOrigin(ctx.get('origin'))
+    if (!origin) throw httpError(400, 'invalid_origin', 'Origin must be an exact HTTP(S) origin')
     this.setCorsHeaders(origin)
     ctx.status = 204
   }
