@@ -10,9 +10,10 @@ import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } fro
 import { ApiClient, ApiError, AlertCondition, AlertDelivery, AlertInstance, AlertNotificationType, AlertRule, AlertRuleType, AlertTarget, AnalyticsExport, AuditLogEntry, CapturePolicy, Cohort, CohortDefinition, CohortPreview, DashboardDetail, DataLifecyclePolicy, DirectMemberCreation, EventExplorerResult, InsightKind, InsightVisibility, ProjectDashboard, ReportCadence, ReportSchedule, SavedDashboard, SavedInsight, SavedInsightDefinition, ErrorDetail, ErrorGroup, FunnelResult, FunnelSubjectKind, PathResult, RetentionPeriod, RetentionResult, HeatmapBin, HeatmapSummary, HeatmapDetail, Invitation, InvitationRole, PerformanceDetail, PerformanceMetric, Project, ProjectKey, ProjectKeyType, ReplayChunk, ReplaySession, SourceMapArtifact, SubjectLifecycleJob, ProjectDeletionRequest, SsoConnection, SsoRole, Tenant, TenantDefaultsResponse, TenantMember, TrendPoint, UsageDaily, UsageReport, UsageSubscription, rangeQuery, usageRangeQuery } from './api'
 import { ConsoleAlert, ConsoleAlertDescription, ConsoleAlertTitle, ConsoleBadge, ConsoleButton, ConsoleCard, ConsoleEmpty, ConsoleInput, ConsoleSelect, ConsolePageHeader, ConsoleSpinner, ConsoleStatCard, ConsoleTable, ConsoleTableBody, ConsoleTableCell, ConsoleTableHead, ConsoleTableHeader, ConsoleTableRow, ConsoleTextarea } from './ui'
 import { replayFrameState, replayPlayerDocument, replayTree, ReplayTreeNode } from './replay-player'
+import { UserJourneysPage } from './console-user-journeys'
 
 const api = new ApiClient(import.meta.env.VITE_ZHIJI_API_BASE_URL ?? '')
-type Route = { kind: 'dashboard' | 'errors' | 'analytics' | 'funnels' | 'retention' | 'paths' | 'performance' | 'heatmaps' | 'replays' | 'alerts' | 'usage' | 'billing' | 'members' | 'auditLogs' | 'insights' | 'dashboards' | 'reportSchedules' | 'cohorts' | 'exports' | 'sourcemaps' | 'lifecycle' | 'tenantSettings' | 'settings' | 'sdk' | 'notFound'; groupId?: string; pageKey?: string; metric?: PerformanceMetric['metric_name'] }
+type Route = { kind: 'dashboard' | 'errors' | 'analytics' | 'funnels' | 'retention' | 'paths' | 'journeys' | 'performance' | 'heatmaps' | 'replays' | 'alerts' | 'usage' | 'billing' | 'members' | 'auditLogs' | 'insights' | 'dashboards' | 'reportSchedules' | 'cohorts' | 'exports' | 'sourcemaps' | 'lifecycle' | 'tenantSettings' | 'settings' | 'sdk' | 'notFound'; groupId?: string; pageKey?: string; metric?: PerformanceMetric['metric_name'] }
 type AppContext = { tenant: Tenant; project: Project }
 type SavedConsoleContext = { tenantId?: string; projectIds: Record<string, string> }
 
@@ -24,6 +25,7 @@ function currentRoute(): Route {
   if (parts[0] === 'funnels') return { kind: 'funnels' }
   if (parts[0] === 'retention') return { kind: 'retention' }
   if (parts[0] === 'paths') return { kind: 'paths' }
+  if (parts[0] === 'journeys') return { kind: 'journeys' }
   if (parts[0] === 'performance' && parts[1]) { const metric = new URLSearchParams(location.search).get('metric'); const pageKey = safePathPart(parts[1]); return pageKey && isPerformanceMetric(metric) ? { kind: 'performance', pageKey, metric } : { kind: 'performance' } }
   if (parts[0] === 'performance') return { kind: 'performance' }
   if (parts[0] === 'heatmaps') return { kind: 'heatmaps' }
@@ -107,6 +109,7 @@ export function ConsoleApp() {
     {route.kind === 'funnels' && <FunnelsPage context={context} />}
     {route.kind === 'retention' && <RetentionPage context={context} />}
     {route.kind === 'paths' && <PathsPage context={context} />}
+    {route.kind === 'journeys' && <UserJourneysPage api={api} scope={{ tenantId: context.tenant.id, projectId: context.project.id }} />}
     {route.kind === 'performance' && (route.pageKey && route.metric ? <PerformanceDetailPage context={context} pageKey={route.pageKey} metric={route.metric} /> : <PerformancePage context={context} />)}
     {route.kind === 'heatmaps' && <HeatmapsPage context={context} />}
     {route.kind === 'replays' && (route.groupId ? <ReplayDetailPage context={context} sessionId={route.groupId} /> : <ReplaysPage context={context} />)}

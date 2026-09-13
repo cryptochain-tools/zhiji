@@ -90,6 +90,8 @@ export default (app: Application) => {
   router.get('/api/tenants/:tenantId/projects/:projectId/funnel', ...projectRead, controller.funnel.show)
   router.get('/api/tenants/:tenantId/projects/:projectId/analytics/retention', ...projectRead, controller.advancedAnalytics.retention)
   router.get('/api/tenants/:tenantId/projects/:projectId/analytics/path', ...projectRead, controller.advancedAnalytics.path)
+  router.get('/api/tenants/:tenantId/projects/:projectId/people', ...projectRead, controller.userJourneys.index)
+  router.get('/api/tenants/:tenantId/projects/:projectId/people/:businessUserId/journey', ...projectRead, controller.userJourneys.show)
   router.get('/api/tenants/:tenantId/projects/:projectId/performance/pages/:pageKey', ...projectRead, controller.reporting.performanceDetail)
   router.get('/api/tenants/:tenantId/projects/:projectId/cohorts', ...projectRead, controller.cohorts.list)
   router.post('/api/tenants/:tenantId/projects/:projectId/cohorts', ...projectWrite, controller.cohorts.create)

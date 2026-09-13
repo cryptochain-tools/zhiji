@@ -59,6 +59,12 @@ export interface PathResult {
   facts_deduplicated: true; source_event_count: number; query_hash: string; computed_at: string; truncated: false
   start_event: string; depth: number; levels: PathLevel[]
 }
+export interface BusinessUserSummary {
+  business_user_id: string; email: string; display_name: string | null; department: string | null; role: string | null
+  is_active: boolean; last_seen_at: string | null; event_count: number
+}
+export interface UserJourneyItem { occurred_at: string; kind: 'page' | 'action'; name: string; route: string | null; release: string | null }
+export interface UserJourneyResult { profile: BusinessUserSummary; from: string; to: string; items: UserJourneyItem[]; has_more: boolean }
 export type AlertNotificationType = 'lark_bot' | 'email' | 'webhook'
 export type AlertRuleType = 'error_new' | 'error_regression' | 'error_count' | 'performance_p75' | 'performance_rating'
 export interface CreatedAlertTarget { id: string; enabled: boolean }
@@ -232,6 +238,8 @@ export class ApiClient {
   funnel(tenantId: string, projectId: string, query: URLSearchParams, signal?: AbortSignal) { return this.get<FunnelResult>(scoped(tenantId, projectId, `/funnel?${query}`), signal) }
   retention(tenantId: string, projectId: string, query: URLSearchParams, signal?: AbortSignal) { return this.get<RetentionResult>(scoped(tenantId, projectId, `/analytics/retention?${query}`), signal) }
   pathAnalysis(tenantId: string, projectId: string, query: URLSearchParams, signal?: AbortSignal) { return this.get<PathResult>(scoped(tenantId, projectId, `/analytics/path?${query}`), signal) }
+  people(tenantId: string, projectId: string, query: URLSearchParams, signal?: AbortSignal) { return this.get<{ items: BusinessUserSummary[] }>(scoped(tenantId, projectId, `/people?${query}`), signal) }
+  userJourney(tenantId: string, projectId: string, businessUserId: string, query: URLSearchParams, signal?: AbortSignal) { return this.get<UserJourneyResult>(scoped(tenantId, projectId, `/people/${encodeURIComponent(businessUserId)}/journey?${query}`), signal) }
   insights(tenantId: string, projectId: string, signal?: AbortSignal) { return this.get<{ items: SavedInsight[] }>(scoped(tenantId, projectId, '/insights'), signal) }
   createInsight(tenantId: string, projectId: string, body: { name: string; description: string | null; visibility: InsightVisibility; definition: SavedInsightDefinition }, signal?: AbortSignal) { return this.post<SavedInsight>(scoped(tenantId, projectId, '/insights'), body, signal) }
   updateInsight(tenantId: string, projectId: string, insightId: string, body: { name: string; description: string | null; visibility: InsightVisibility; definition: SavedInsightDefinition; expected_definition_version: number }, signal?: AbortSignal) { return this.patch<SavedInsight>(scoped(tenantId, projectId, `/insights/${encodeURIComponent(insightId)}`), body, signal) }

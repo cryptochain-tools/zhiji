@@ -9,7 +9,7 @@ import {
 } from './types'
 
 /** The ready endpoint may only turn green after all application facts exist. */
-export const CURRENT_SCHEMA_VERSION = '036_business_user_profiles'
+export const CURRENT_SCHEMA_VERSION = '037_user_journey_identity_index'
 
 export interface DatabaseRuntimeOptions {
   databaseUrl?: string

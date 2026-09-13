@@ -20,6 +20,25 @@ test('usage range uses UTC calendar-day boundaries', () => {
   assert.equal(Date.parse(query.get('to') ?? '') - Date.parse(query.get('from') ?? ''), 30 * 86_400_000)
 })
 
+test('user directory and journey remain project-scoped and encode the business user identifier', async () => {
+  const originalFetch = globalThis.fetch
+  const calls: string[] = []
+  globalThis.fetch = async input => {
+    calls.push(String(input))
+    const data = calls.length === 1 ? { items: [] } : { profile: {}, from: '', to: '', items: [], has_more: false }
+    return new Response(JSON.stringify({ data }), { status: 200, headers: { 'content-type': 'application/json' } })
+  }
+  try {
+    const client = new ApiClient('https://api.example.test')
+    await client.people('tenant/a', 'project b', new URLSearchParams({ search: '林', limit: '25' }))
+    await client.userJourney('tenant/a', 'project b', 'user/42', new URLSearchParams({ from: '2026-09-01T00:00:00.000Z', to: '2026-09-02T00:00:00.000Z', limit: '100' }))
+    assert.deepEqual(calls, [
+      'https://api.example.test/api/tenants/tenant%2Fa/projects/project%20b/people?search=%E6%9E%97&limit=25',
+      'https://api.example.test/api/tenants/tenant%2Fa/projects/project%20b/people/user%2F42/journey?from=2026-09-01T00%3A00%3A00.000Z&to=2026-09-02T00%3A00%3A00.000Z&limit=100',
+    ])
+  } finally { globalThis.fetch = originalFetch }
+})
+
 test('replay list keeps bounded filters and cursor in the project-scoped request', async () => {
   const originalFetch = globalThis.fetch
   let requested = ''

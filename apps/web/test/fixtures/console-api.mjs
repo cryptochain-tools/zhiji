@@ -32,6 +32,10 @@ const projects = [project, emptyProject, forbiddenProject, errorProject]
 const insight = { id: 'insight-signup', name: '注册转化', description: '示例数据，仅用于本地视觉验收。', kind: 'funnel', visibility: 'project', definition_version: 1, created_by: 'fixture-owner', updated_by: 'fixture-owner', created_at: iso(-10), updated_at: iso(-1), definition: { schema_version: 1, kind: 'funnel', subject_kind: 'visitor', from: iso(-30), to: iso(), timezone: 'Asia/Shanghai', steps: ['page_view', 'signup'] } }
 const dashboard = { id: 'dashboard-growth', name: '增长概览', description: '本地合成仪表盘。', visibility: 'project', version: 1, created_by: 'fixture-owner', updated_by: 'fixture-owner', created_at: iso(-9), updated_at: iso(-1) }
 const errorGroup = { id: 'error-checkout', status: 'unresolved', type: 'TypeError', display_message: 'Cannot read properties of undefined', release: 'web-2026.09.12', first_seen: iso(-3), last_seen: iso(-1), occurrence_count: 42, resolved_at: null, state_version: 2 }
+const people = [
+  { business_user_id: 'user_fixture_42', email: 'lin@example.test', display_name: '林澄', department: '招投标中心', role: '项目经理', is_active: true, last_seen_at: iso(0, -1), event_count: 38 },
+  { business_user_id: 'user_fixture_77', email: 'zhou@example.test', display_name: '周岚', department: '经营管理部', role: '分析员', is_active: true, last_seen_at: iso(-1, 2), event_count: 16 },
+]
 const ok = (data) => ({ data, meta: { request_id: 'fixture-readonly' } })
 const failure = (code, message) => ({ error: { code, message }, meta: { request_id: 'fixture-readonly' } })
 
@@ -65,6 +69,9 @@ function dataFor(path, query) {
   if (path === `${base}/funnel`) return funnel(query)
   if (path === `${base}/analytics/retention`) return retention(query)
   if (path === `${base}/analytics/path`) return pathAnalysis(query)
+  if (path === `${base}/people`) return { items: people.filter(person => !query.get('search') || `${person.business_user_id} ${person.email} ${person.display_name}`.toLowerCase().includes(query.get('search').toLowerCase())) }
+  if (path === `${base}/people/${people[0].business_user_id}/journey`) return userJourney(people[0])
+  if (path === `${base}/people/${people[1].business_user_id}/journey`) return userJourney(people[1])
   if (path === `${base}/usage`) return { from: iso(-7), to: iso(), lane: query.get('lane') || null, totals: { received_events: 21960, received_bytes: 4839100 }, daily: usage() }
   if (path === `${base}/keys`) return { items: [{ id: 'key-browser', key_type: 'browser', label: '官网浏览器 Key', prefix: 'zj_bro_fixture', created_at: iso(-40), disabled_at: null }, { id: 'key-server', key_type: 'server', label: 'API 服务 Key', prefix: 'zj_srv_fixture', created_at: iso(-30), disabled_at: null }] }
   if (path === `${base}/insights`) return { items: [insight] }
@@ -91,7 +98,7 @@ function emptyProjectData(suffix, query) {
   if (suffix === '/analytics/trend') return { from: iso(-7), to: iso(), granularity: 'day', points: [] }
   if (suffix === '/events') return { from: iso(-7), to: iso(), group_by: query.get('group_by') || 'name', items: [], truncated: false }
   if (suffix === '/replays') return { items: [], next_cursor: null }
-  if (suffix === '/errors' || suffix === '/performance' || suffix === '/keys' || suffix === '/insights' || suffix === '/dashboards' || suffix === '/cohorts' || suffix === '/data-exports' || suffix === '/deletions' || suffix === '/sourcemaps') return { items: [] }
+  if (suffix === '/errors' || suffix === '/performance' || suffix === '/keys' || suffix === '/insights' || suffix === '/dashboards' || suffix === '/cohorts' || suffix === '/people' || suffix === '/data-exports' || suffix === '/deletions' || suffix === '/sourcemaps') return { items: [] }
   if (suffix === '/heatmaps') return { page_key: query.get('page_key') || '/', items: [] }
   if (suffix === '/funnel') return { ...common, timezone: 'UTC', steps: (query.get('steps') || 'page_view,signup').split(',').map(name => ({ name, count: 0, conversion: 0, dropoff: 0 })) }
   if (suffix === '/analytics/retention') return { ...common, kind: 'retention', period: query.get('period') || 'day', period_count: Number(query.get('period_count') || 7), start_event: query.get('start_event') || 'page_view', return_event: query.get('return_event') || 'page_view', cohorts: [] }
@@ -107,6 +114,11 @@ const performanceDetail = (page_key, metric) => ({ from: iso(-30), to: iso(), pa
 const funnel = q => { const steps = (q.get('steps') || 'page_view,signup').split(','); return { from: iso(-7), to: iso(), timezone: 'UTC', subject_kind: q.get('subject_kind') || 'visitor', identity_attribution: 'all_linked', facts_deduplicated: true, source_event_count: 21960, query_hash: 'fixture', computed_at: iso(), truncated: false, steps: steps.map((name, index) => ({ name, count: 3200 - index * 700, conversion: index ? 78.13 : 100, dropoff: index ? 700 : 0 })) } }
 const retention = q => ({ kind: 'retention', from: iso(-30), to: iso(), timezone: q.get('timezone') || 'Asia/Shanghai', subject_kind: q.get('subject_kind') || 'visitor', identity_attribution: 'all_linked', facts_deduplicated: true, source_event_count: 21960, query_hash: 'fixture', computed_at: iso(), truncated: false, period: q.get('period') || 'day', period_count: Number(q.get('period_count') || 7), start_event: q.get('start_event') || 'page_view', return_event: q.get('return_event') || 'page_view', cohorts: [{ cohort_start: iso(-7), cohort_size: 320, retained: Array.from({ length: Number(q.get('period_count') || 7) }, (_, index) => ({ period: index + 1, count: 210 - index * 12, rate: 65.62 - index * 3.75 })) }] })
 const pathAnalysis = q => ({ kind: 'path', from: iso(-30), to: iso(), timezone: 'Asia/Shanghai', subject_kind: q.get('subject_kind') || 'visitor', identity_attribution: 'all_linked', facts_deduplicated: true, source_event_count: 21960, query_hash: 'fixture', computed_at: iso(), truncated: false, start_event: q.get('start_event') || 'page_view', depth: Number(q.get('depth') || 3), levels: [{ depth: 1, nodes: [{ parent_path: [], name: 'signup', count: 812 }, { parent_path: [], name: 'view_pricing', count: 603 }], other_count: 111 }, { depth: 2, nodes: [{ parent_path: ['signup'], name: 'checkout_complete', count: 386 }], other_count: 0 }] })
+const userJourney = profile => ({ profile, from: iso(-30), to: iso(), has_more: false, items: [
+  { occurred_at: iso(0, -1), kind: 'page', name: 'page_view', route: '/bids/:bidId/', release: 'web-2026.09.12' },
+  { occurred_at: iso(0, -2), kind: 'action', name: 'acme.workspace.record.export.attempt', route: null, release: 'web-2026.09.12' },
+  { occurred_at: iso(0, -3), kind: 'page', name: 'acme.workspace.record_list.page_enter', route: '/records/', release: 'web-2026.09.12' },
+] })
 const usage = () => Array.from({ length: 7 }, (_, index) => ({ usage_date: iso(index - 6).slice(0, 10), lane: ['analytics', 'error', 'behavior', 'replay', 'performance'][index % 5], received_events: 1200 + index * 39, received_bytes: 320000 + index * 10000 }))
 const subscription = () => ({ subscription_id: 'subscription-fixture', cycle_started_at: iso(-12), cycle_ends_at: iso(18), hard_limit_enabled: false, grace_percent: 10, plan: { id: 'plan-fixture', code: 'internal-preview', name: '预览套餐', included_events: 100000, included_errors: 10000, included_behavior_events: 50000, included_replay_bytes: 1_073_741_824, retention_days_max: 365, export_concurrency: 2, member_limit: 20 }, counters: ['analytics', 'error', 'behavior', 'replay', 'performance'].map((lane, index) => ({ lane, accepted_events: 12000 - index * 1000, accepted_bytes: 2_000_000, adjustment_events: 0, adjustment_bytes: 0 })) })
 const replayEvents = () => [{ t: 'snapshot', at: now.getTime() - 123000, tree: { tag: 'main', children: [{ tag: 'h1' }, { tag: 'button', id: 'signup-submit' }] } }, ...Array.from({ length: 122 }, (_, index) => index % 17 === 0 ? { t: 'route', at: now.getTime() - (122 - index) * 1000, route: index % 34 === 0 ? '/pricing' : '/signup' } : { t: 'scroll', at: now.getTime() - (122 - index) * 1000, x: 0, y: index * 24 })]

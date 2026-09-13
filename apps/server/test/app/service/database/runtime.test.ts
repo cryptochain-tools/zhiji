@@ -13,7 +13,7 @@ describe('PgDatabaseRuntime', () => {
     assert.deepEqual(await runtime.checkReadiness(), {
       connected: false,
       schemaVersion: null,
-      expectedSchemaVersion: '036_business_user_profiles',
+      expectedSchemaVersion: '037_user_journey_identity_index',
       ready: false,
     })
     await assert.rejects(() => runtime.query('SELECT 1'), /DATABASE_URL is required/)
@@ -22,7 +22,7 @@ describe('PgDatabaseRuntime', () => {
   it('requires the current migration for readiness', async () => {
     const driver = new FakeDriver([
       result([{ connected: 1 }]),
-      result([{ id: '036_business_user_profiles' }]),
+      result([{ id: '037_user_journey_identity_index' }]),
     ])
     const runtime = new PgDatabaseRuntime(
       { databaseUrl: 'postgres://not-used-in-test/zhiji' },
@@ -31,8 +31,8 @@ describe('PgDatabaseRuntime', () => {
 
     assert.deepEqual(await runtime.checkReadiness(), {
       connected: true,
-      schemaVersion: '036_business_user_profiles',
-      expectedSchemaVersion: '036_business_user_profiles',
+      schemaVersion: '037_user_journey_identity_index',
+      expectedSchemaVersion: '037_user_journey_identity_index',
       ready: true,
     })
     assert.deepEqual(driver.queries, [

@@ -13,6 +13,7 @@ export const consoleGroups = [
     { kind: 'funnels', href: '/funnels', label: '漏斗分析', icon: '▽' },
     { kind: 'retention', href: '/retention', label: '留存分析', icon: '↺' },
     { kind: 'paths', href: '/paths', label: '路径分析', icon: '⌘' },
+    { kind: 'journeys', href: '/journeys', label: '用户旅程', icon: '↝' },
     { kind: 'cohorts', href: '/cohorts', label: '用户分群', icon: '◎' },
   ] },
   { title: '洞察与报表', items: [
