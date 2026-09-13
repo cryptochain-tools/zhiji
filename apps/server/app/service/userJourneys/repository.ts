@@ -87,7 +87,7 @@ export class UserJourneysRepository {
     await this.database.query(
       `INSERT INTO audit_logs (id, tenant_id, actor_user_id, action, target_type, target_id, request_id, metadata)
        VALUES ($1, $2, $3, 'business_user_journey_viewed', 'business_user', $4, $5,
-         jsonb_build_object('project_id', $6, 'from', $7::timestamptz, 'to', $8::timestamptz, 'returned_count', $9::integer))`,
+         jsonb_build_object('project_id', $6::text, 'from', $7::timestamptz, 'to', $8::timestamptz, 'returned_count', $9::integer))`,
       [ randomUUID(), query.tenantId, actorUserId, query.businessUserId, requestId ?? null, query.projectId, query.from, query.to, returnedCount ],
     )
   }

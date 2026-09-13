@@ -56,6 +56,7 @@ describe('UserJourneysManagementService', () => {
     assert.doesNotMatch(calls[1]!.text, /event\.business_user_id/)
     assert.doesNotMatch(calls[1]!.text, /properties/)
     assert.match(calls[2]!.text, /business_user_journey_viewed/)
+    assert.match(calls[2]!.text, /'project_id', \$6::text/)
     assert.equal(calls[2]!.values?.[3], '42')
     assert.equal(calls[2]!.values?.[4], 'request-1')
   })
