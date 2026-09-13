@@ -98,13 +98,19 @@ export default function boot(app: Application) {
   app.coreLogger.info({ module: 'bootstrap', action: 'started' })
 }
 
-function replayPolicy(value: Record<string, unknown>) {
+export function replayPolicy(value: Record<string, unknown>) {
+  const policyVersion = typeof value.policy_version === 'number' && Number.isSafeInteger(value.policy_version) && value.policy_version > 0 ? value.policy_version : 1
+  const sampleRate = typeof value.sample_rate === 'number' && Number.isFinite(value.sample_rate) && value.sample_rate > 0 && value.sample_rate <= 1 ? value.sample_rate : 0
+  const pageAllowlist = Array.isArray(value.page_allowlist) && value.page_allowlist.length > 0 && value.page_allowlist.every(entry => typeof entry === 'string') ? value.page_allowlist : []
+  const maxSessionSeconds = typeof value.max_session_seconds === 'number' && Number.isSafeInteger(value.max_session_seconds) && value.max_session_seconds > 0 ? value.max_session_seconds : 0
+  const maxSessionBytes = typeof value.max_session_bytes === 'number' && Number.isSafeInteger(value.max_session_bytes) && value.max_session_bytes > 0 ? value.max_session_bytes : 0
+  const enabled = value.enabled === true && sampleRate > 0 && pageAllowlist.length > 0 && maxSessionSeconds > 0 && maxSessionBytes > 0
   return {
-    enabled: value.enabled === true,
-    policy_version: typeof value.policy_version === 'number' ? value.policy_version : 1,
-    sample_rate: typeof value.sample_rate === 'number' ? value.sample_rate : 0,
-    page_allowlist: Array.isArray(value.page_allowlist) && value.page_allowlist.every(entry => typeof entry === 'string') ? value.page_allowlist : [],
-    max_session_seconds: typeof value.max_session_seconds === 'number' ? value.max_session_seconds : 0,
-    max_session_bytes: typeof value.max_session_bytes === 'number' ? value.max_session_bytes : 0,
+    enabled,
+    policy_version: policyVersion,
+    sample_rate: enabled ? sampleRate : 0,
+    page_allowlist: enabled ? pageAllowlist : [],
+    max_session_seconds: enabled ? maxSessionSeconds : 0,
+    max_session_bytes: enabled ? maxSessionBytes : 0,
   }
 }
