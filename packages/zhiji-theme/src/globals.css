@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+@import './theme.css';
+@import './tokens/business.css';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 显式扫描 workspace 包源码 — Tailwind v4 默认跳过 node_modules，
+   workspace 包通过 pnpm symlink 解析时会落入跳过范围，
+   导致 packages/design 内独有的 arbitrary value（如 w-[292px]、top-[calc(100%+8px)]）
+   和稀有 utility（如 grid-cols-7、rounded-xl/2xl/4xl）不被生成。 */
+@source "../../zhiji-design/src/**/*.{ts,tsx}";
+
+/* Tailwind v4 把 border-* 默认色从 gray-200 改成了 currentColor，
+   导致所有不带颜色的 border-b / border-t / border 直接用文字色画线，
+   表格分隔线、Separator、ScrollArea 视觉过重。
+   这里跟 shadcn 模板一样兜底一遍：所有元素默认 border 颜色用 --border。 */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
+  }
+
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    min-height: 100%;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-family-sans);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100dvh;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+}
+
+/* 品牌渐变与品牌阴影 utility — 让 Button default、CTA 卡片快速拿到品牌身份 */
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+@utility shadow-brand {
+  box-shadow: var(--shadow-brand);
+}
+@utility shadow-bull {
+  box-shadow: var(--shadow-bull);
+}
+@utility shadow-bear {
+  box-shadow: var(--shadow-bear);
+}
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+
+/* ============================================================
+ * globals-additions.css
+ * Paste these blocks into packages/theme/src/globals.css
+ * ============================================================ */
+
+/* ── Skeleton shimmer ──────────────────────────────────────── */
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/*
+ * animate-shimmer
+ *
+ * Used by: redesigned/skeleton.tsx
+ * The component sets the gradient via arbitrary-value classes;
+ * this utility supplies the background-size + animation.
+ */
+@utility animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Progress indeterminate stripes ────────────────────────── */
+
+@keyframes progress-stripes {
+  to { background-position: 24px 0; }
+}
+
+/*
+ * animate-progress-stripes
+ *
+ * Used by: redesigned/progress.tsx (tone="indeterminate")
+ * The component sets the repeating-linear-gradient via Tailwind
+ * arbitrary-value classes; this supplies the animation.
+ */
+@utility animate-progress-stripes {
+  animation: progress-stripes 0.8s linear infinite;
+}

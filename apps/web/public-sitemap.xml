@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://&lt;zhiji-public-host&gt;/</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/product</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/quickstart</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/sdk/browser</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/sdk/server</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/sdk/mobile</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/identity</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/ingestion</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/privacy</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/docs/operations</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/security</loc></url>
+  <url><loc>https://&lt;zhiji-public-host&gt;/self-hosting</loc></url>
+</urlset>

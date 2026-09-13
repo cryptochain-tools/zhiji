@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible problem without private telemetry or credentials.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include API keys, cookies, Source Maps, replay content, database URLs, or personal data.
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide the smallest safe reproduction.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Zhiji version or commit
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment type
+      options: [Local development, Self-hosted production, SDK only]
+    validations:
+      required: true

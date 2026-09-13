@@ -1,0 +1,17 @@
+{
+  "name": "zhiji",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "overrides": {
+      "egg>urllib4": "npm:urllib@4.9.1",
+      "uuid": "11.1.1"
+    }
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test"
+  }
+}

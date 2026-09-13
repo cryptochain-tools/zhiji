@@ -1,0 +1,33 @@
+{
+  "name": "@zhiji/server",
+  "version": "0.1.0",
+  "private": true,
+  "egg": {
+    "typescript": true
+  },
+  "scripts": {
+    "dev": "egg-bin dev",
+    "start": "EGG_TYPESCRIPT=true egg-scripts start --require ts-node/register/transpile-only --workers=1 --title=zhiji-server",
+    "migrate": "tsx scripts/migrate.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "egg-bin test"
+  },
+  "dependencies": {
+    "@jridgewell/trace-mapping": "0.3.31",
+    "@zhiji/contracts": "workspace:*",
+    "egg": "^3.30.1",
+    "egg-scripts": "^3.0.1",
+    "pg": "^8.23.0",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@eggjs/tsconfig": "^2.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "egg-bin": "^6.13.0",
+    "egg-mock": "^5.15.1",
+    "tsx": "^4.23.13",
+    "typescript": "^5.8.0"
+  }
+}

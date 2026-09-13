@@ -1,0 +1,16 @@
+/* Public site tokens. Console continues to consume the shared theme unchanged. */
+.site-root {
+  --background:#f4f5f7;
+  --foreground:#121617;
+  --muted:#edf0f2;
+  --muted-foreground:#626b76;
+  --foreground-tertiary:#697480;
+  --card:#fff;
+  --card-foreground:#121617;
+  --border:#e1e5e8;
+  --brand:#00b974;
+  --brand-text:#00875a;
+  --brand-muted:#e5f7f0;
+  --primary:#00b974;
+  --primary-foreground:#fff;
+}

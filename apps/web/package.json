@@ -1,0 +1,28 @@
+{
+  "name": "@zhiji/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "@zhiji/contracts": "workspace:*",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "@zhiji/design": "workspace:*",
+    "@zhiji/theme": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.2",
+    "tsx": "^4.23.13",
+    "typescript": "^5.8.0",
+    "vite": "^8.3.0",
+    "@tailwindcss/vite": "^4.2.4"
+  }
+}

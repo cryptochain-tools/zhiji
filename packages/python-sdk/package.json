@@ -1,0 +1,10 @@
+{
+  "name": "@zhiji/python-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace tasks for the zhiji-sdk PyPI package",
+  "scripts": {
+    "build": "python3 -m pip wheel --no-deps --wheel-dir dist .",
+    "test": "PYTHONPATH=src python3 -m unittest discover -s tests -v"
+  }
+}

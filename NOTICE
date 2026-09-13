@@ -1,0 +1,13 @@
+Zhiji
+Copyright 2026 Zhiji contributors.
+
+The `packages/zhiji-design` and `packages/zhiji-theme` directories are
+vendored snapshots of source first authored in the Earntools repository at
+revision 408958b542159ef7c00e3b0b73b6c96dea131ee6. The rights holder confirmed
+on 2026-09-13 that these snapshots may be included in Zhiji and redistributed
+under AGPL-3.0-or-later. Their provenance and local adaptations are recorded in
+each package's `UPSTREAM.md`.
+
+Third-party runtime and build dependencies remain subject to their own
+licenses. See THIRD_PARTY_NOTICES.md and the lockfile for the complete,
+versioned dependency inventory.

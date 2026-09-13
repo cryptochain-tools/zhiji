@@ -1,0 +1,5 @@
+.brand-link { display: inline-flex; align-items: center; gap: 10px; width: max-content; text-decoration: none; }
+.zhiji-logo { display: inline-flex; flex: none; align-items: center; gap: 9px; color: #121617; font-family: var(--font-family-sans); font-size: 24px; font-weight: 700; line-height: 1; letter-spacing: -.06em; }
+.zhiji-logo .zhiji-logo-mark { display: grid; place-items: center; flex: none; width: 31px; height: 33px; border-radius: 9px 9px 9px 2px; color: #fff; background: #00b974; font-size: 18px; font-weight: 700; letter-spacing: 0; }
+.zhiji-logo .zhiji-logo-name { color: inherit; }
+.brand-link > small { color: var(--muted-foreground); font-size: 10px; font-weight: 500; }

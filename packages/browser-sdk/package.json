@@ -1,0 +1,37 @@
+{
+  "name": "@zhiji-labs/browser-sdk",
+  "version": "0.1.1",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "keywords": ["analytics", "error-monitoring", "observability", "web"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cryptochain-tools/zhiji.git",
+    "directory": "packages/browser-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/cryptochain-tools/zhiji/issues"
+  },
+  "homepage": "https://github.com/cryptochain-tools/zhiji#sdk-%E4%B8%8E%E9%87%87%E9%9B%86",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "rm -rf .test-dist && tsc -p tsconfig.test.json && node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

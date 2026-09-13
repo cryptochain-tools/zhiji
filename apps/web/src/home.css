@@ -1,0 +1,205 @@
+/* Public website; shared green/white theme stays isolated from the console. */
+.site-root .zhome { --z-ink:#121a18; --z-muted:#5e6c67; --z-line:#dbe5e0; color:var(--z-ink); background:var(--background); overflow:clip; }
+.site-root .zhome * { box-sizing:border-box; }
+.site-root .zhome h1,.site-root .zhome h2,.site-root .zhome h3,.site-root .zhome p { margin:0; }
+.site-root .zhome h1,.site-root .zhome h2 { font-weight:650; letter-spacing:-.055em; text-wrap:balance; }
+.site-root .zhome h1 { font-size:clamp(42px,4.8vw,70px); line-height:1.22; }
+.site-root .zhome h2 { font-size:clamp(32px,3.6vw,49px); line-height:1.3; }
+.site-root .zhome em { color:var(--brand-text); font-style:normal; }
+.site-root .zhome a { text-decoration:none; }
+.site-root .zhome [data-slot=button] { min-height:48px; padding-inline:23px; border-radius:9px; font-size:14px; font-weight:600; }
+.site-root .zhome-hero { position:relative; isolation:isolate; background:linear-gradient(120deg,#fff 10%,#f2f8f5 80%); }
+.site-root .zhome-particles { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:-1; }
+.site-root .zhome-hero-inner { display:grid; grid-template-columns:1.12fr 1fr; align-items:center; min-height:650px; height:calc(100svh - 80px); max-height:900px; gap:20px; padding-block:60px; }
+.site-root .zhome-hero-copy { position:relative; z-index:1; }
+.site-root .zhome-badge { display:inline-flex; gap:8px; margin-bottom:27px; padding:7px 11px; border:1px solid #c6dfd2; color:#3b6c56; background:#ffffffbd; font-size:12px; }
+.site-root .zhome-badge i,.site-root .orbit-label i,.site-root .zhome-issue-art header i { width:6px; height:6px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 4px #00b97412; }
+.site-root .zhome-hero-copy>p { max-width:490px; margin-top:26px; color:var(--z-muted); font-size:17px; line-height:1.95; }
+.site-root .zhome-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+.site-root .zhome-actions [data-slot=button]:first-child,.site-root .zhome-closing [data-slot=button] { color:#fff; background:var(--brand-text); border:1px solid var(--brand-text); box-shadow:0 8px 20px #00875a16; }
+.site-root .zhome-actions [data-slot=button]:last-child { background:#ffffffc9; border:1px solid var(--z-line); color:var(--z-ink); }
+.site-root .zhome-open-source-note { max-width:480px; margin-top:13px; color:#718177; font-size:12px; line-height:1.7; }
+.site-root .zhome-trust { display:flex; gap:20px; margin-top:25px; font-size:12px; color:#62796e; }
+.site-root .zhome-trust span:before { content:'✓'; margin-right:6px; color:var(--brand-text); }
+.site-root .zhome-orbit-labels { position:relative; height:400px; pointer-events:none; }
+.site-root .orbit-label { display:flex; align-items:center; gap:10px; position:absolute; padding:13px 17px; border:1px solid #ffffffd9; border-radius:9px; background:#ffffffdc; box-shadow:0 9px 30px #1c744b12; font-size:12px; color:#476655; }
+.site-root .orbit-label b { margin-left:14px; color:var(--brand-text); font-size:11px; }
+.site-root .orbit-one { top:22%; left:4%; }
+.site-root .orbit-two { top:48%; right:0; }
+.site-root .orbit-three { top:70%; left:12%; }
+.site-root .orbit-three i { background:#c17d34; box-shadow:0 0 0 4px #c17d3410; }
+.site-root .orbit-three b { color:#946124; }
+.site-root .orbit-caption { position:absolute; bottom:-45px; right:18%; color:#4d7661; font-size:13px; letter-spacing:.03em; text-align:center; }
+.site-root .orbit-caption small { display:block; font-size:10px; opacity:.6; margin-top:8px; }
+.site-root .zhome-demo { padding-block:104px 70px; scroll-margin-top:30px; }
+.site-root .zhome-section-head { display:flex; justify-content:space-between; align-items:end; gap:60px; margin-bottom:42px; }
+.site-root .zhome-section-head small,.site-root .zhome-feature>div>small,.site-root .zhome-closing small { display:block; margin-bottom:18px; color:var(--brand-text); font-size:12px; letter-spacing:.07em; font-weight:600; }
+.site-root .zhome-section-head>p { max-width:330px; font-size:15px; line-height:1.9; color:var(--z-muted); }
+.site-root .zhome-studio { border:1px solid #d5e2db; border-radius:15px; overflow:hidden; background:#fff; box-shadow:0 28px 65px #173f2d0e; }
+.site-root .zhome-studio>header { display:flex; align-items:center; gap:12px; height:55px; padding:0 22px; border-bottom:1px solid #e4ebe7; font-size:12px; color:#5c7065; }
+.site-root .zhome-logo { display:grid; place-items:center; width:25px; height:25px; background:var(--brand-text); border-radius:6px; color:white; font-weight:700; }
+.site-root .zhome-studio>header [data-slot=badge] { margin-left:auto; font-size:10px; }
+.site-root .zhome-studio>header>i { display:grid; place-items:center; width:25px; height:25px; border-radius:50%; background:#e9f6ef; font-style:normal; }
+.site-root .zhome-studio-layout { display:grid; grid-template-columns:150px 1fr; }
+.site-root .zhome-studio-layout>aside { border-right:1px solid #e7eeea; background:#fafcfb; padding:20px 12px; font-size:12px; color:#6b8075; }
+.site-root .zhome-studio-layout>aside>* { display:block; padding:10px 14px; margin-bottom:5px; border-radius:6px; }
+.site-root .zhome-studio-layout>aside>b { background:#e6f6ed; color:var(--brand-text); }
+.site-root .zhome-studio-layout>section { min-width:0; padding:28px 35px 24px; }
+.site-root .zhome-panel-top { display:flex; justify-content:space-between; gap:15px; }
+.site-root .zhome-panel-top small { color:#72847b; font-size:10px; }
+.site-root .zhome-panel-top h3 { margin-top:6px; font-size:21px; letter-spacing:-.025em; }
+.site-root .zhome-panel-top p { margin-top:7px; color:#75867c; font-size:12px; }
+.site-root .zhome-panel-top em { align-self:start; color:#738279; padding:6px 10px; border:1px solid #e1e9e4; border-radius:5px; font-size:11px; white-space:nowrap; }
+.site-root .zhome-tabs { display:flex; border-bottom:1px solid #e3ebe6; margin-top:20px; gap:22px; }
+.site-root .zhome-tabs button { background:none; border:0; border-bottom:2px solid transparent; padding:12px 0; font-size:12px; color:#738278; cursor:pointer; min-height:44px; }
+.site-root .zhome-tabs button[aria-selected=true] { color:var(--brand-text); border-bottom-color:var(--brand); font-weight:600; }
+.site-root .zhome-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin:20px 0; }
+.site-root .zhome-metrics>div { padding:15px 18px; border:1px solid #e4ebe7; border-radius:8px; }
+.site-root .zhome-metrics small { display:block; color:#78857e; font-size:11px; }
+.site-root .zhome-metrics strong { display:block; font-size:29px; font-weight:600; letter-spacing:-.05em; margin:7px 0; }
+.site-root .zhome-metrics span { color:var(--brand-text); font-size:10px; }
+.site-root .zhome-metrics .warn { color:#a36928; }
+.site-root .zhome-chart-panel { border:1px solid #e2eae5; padding:16px 20px 12px; border-radius:8px; }
+.site-root .zhome-chart-panel>div { display:flex; justify-content:space-between; font-size:12px; }
+.site-root .zhome-chart-panel small { font-size:10px; color:#849088; }
+.site-root .zhome-chart { display:block; width:100%; height:150px; margin-top:12px; }
+.site-root .zhome-chart-panel>footer { display:flex; justify-content:space-between; background:none; border:0; padding:8px 0 0; font-size:10px; color:#829087; }
+.site-root .zhome-insight { display:flex; gap:10px; align-items:center; background:#f0f9f4; border-radius:6px; padding:12px; margin-top:15px; font-size:11px; }
+.site-root .zhome-insight>i { width:6px; height:6px; background:var(--brand); border-radius:50%; }
+.site-root .zhome-insight small { margin-left:12px; color:#6b8476; font-size:10px; }
+.site-root .zhome-insight>span { margin-left:auto; color:var(--brand-text); }
+.site-root .zhome-demo-notes { display:grid; grid-template-columns:repeat(3,1fr); gap:25px; margin-top:32px; color:var(--z-muted); font-size:13px; }
+.site-root .zhome-demo-notes b { display:block; color:var(--z-ink); font-size:15px; margin-bottom:7px; }
+.site-root .zhome-feature { display:grid; grid-template-columns:1fr 1.16fr; gap:75px; align-items:center; padding-block:100px; }
+.site-root .zhome-feature p { margin-top:24px; color:var(--z-muted); font-size:16px; line-height:1.9; }
+.site-root .zhome-feature ul { padding:0; margin:22px 0 27px; list-style:none; color:#51685b; font-size:13px; line-height:2.25; }
+.site-root .zhome-feature li:before { content:'✓'; color:var(--brand-text); margin-right:10px; }
+.site-root .zhome-feature a,.site-root .zhome-steps a,.site-root .zhome-data-note a { color:var(--brand-text); font-size:13px; font-weight:600; }
+.site-root .zhome-feature-art { position:relative; border-radius:14px; background:#eaf2ed; padding-bottom:120px; }
+.site-root .zhome-feature-art>img { display:block; width:100%; height:auto; border-radius:14px; }
+.site-root .zhome-flow-ui { position:absolute; left:20px; right:20px; bottom:20px; padding:15px; background:#fffffff2; border:1px solid #e0e9e3; border-radius:10px; box-shadow:0 12px 22px #18432b0a; }
+.site-root .zhome-flow-ui>header { display:flex; gap:4px; font-size:10px; color:#677d70; align-items:center; }
+.site-root .zhome-flow-ui>header>i { width:5px; height:5px; background:#cfddd5; border-radius:50%; }
+.site-root .zhome-flow-ui>header>b { margin-left:6px; }
+.site-root .zhome-flow-ui>header>span { margin-left:auto; }
+.site-root .zhome-flow-steps { display:grid; grid-template-columns:1fr 12px 1fr 12px 1fr; align-items:center; gap:6px; margin-top:14px; }
+.site-root .zhome-flow-steps>div { padding:9px; border:1px solid #e1e9e4; border-radius:6px; }
+.site-root .zhome-flow-steps small { font-size:9px; color:#84998d; }
+.site-root .zhome-flow-steps b { display:block; font-size:11px; margin:3px 0; }
+.site-root .zhome-flow-steps span { color:#789082; font-size:10px; }
+.site-root .zhome-flow-steps i { font-size:11px; color:#91ae9e; font-style:normal; }
+.site-root .zhome-flow-steps .final { background:#f0faf4; border-color:#c8e6d6; }
+.site-root .zhome-flow-ui>footer { background:#f1f7f3; border:0; border-radius:5px; padding:9px; margin-top:12px; font-size:10px; color:#74877b; }
+.site-root .zhome-flow-ui>footer>b { display:block; color:#407052; margin-bottom:3px; }
+.site-root .zhome-errors { background:#eaf1ed; }
+.site-root .zhome-errors .zhome-feature { grid-template-columns:1.16fr 1fr; }
+.site-root .zhome-issue-art { background:#fff; border-radius:14px; padding:27px; box-shadow:0 24px 45px #203d2e09; border:1px solid #d9e5dd; }
+.site-root .zhome-issue-art>header { display:flex; justify-content:space-between; font-size:12px; color:#53735e; padding-bottom:24px; border-bottom:1px solid #e6ece8; }
+.site-root .zhome-issue-art>header>span { display:flex; align-items:center; gap:10px; }
+.site-root .zhome-issue-art>header small { color:#8c9990; font-size:10px; }
+.site-root .zhome-issue-row { display:flex; align-items:center; gap:12px; margin:24px 0; }
+.site-root .issue-mark { display:grid; place-items:center; width:36px; height:36px; background:#fff3e7; color:#a86a25; border-radius:9px; font-size:22px; }
+.site-root .zhome-issue-row b { font-size:15px; }
+.site-root .zhome-issue-row small { display:block; color:#819185; font-size:10px; margin-top:6px; }
+.site-root .zhome-issue-row [data-slot=badge] { margin-left:auto; font-size:10px; }
+.site-root .zhome-issue-stats { display:grid; grid-template-columns:repeat(3,1fr); padding:18px; background:#f5f8f6; border-radius:7px; }
+.site-root .zhome-issue-stats small { color:#819185; display:block; font-size:11px; }
+.site-root .zhome-issue-stats strong { font-size:29px; font-weight:600; }
+.site-root .zhome-issue-stats .issue-status { font-size:17px; line-height:2.7; color:#a17637; }
+.site-root .zhome-issue-trace { display:flex; justify-content:space-between; gap:6px; font-size:11px; margin-top:27px; color:#79877f; }
+.site-root .zhome-issue-trace b { color:#a56b29; }
+.site-root .zhome-issue-art>p { font-size:11px; border-top:1px solid #e6ece8; padding-top:18px; }
+.site-root .zhome-performance-art { position:relative; margin:0; padding-bottom:45px; }
+.site-root .zhome-performance-art img { display:block; width:100%; height:auto; border-radius:14px; }
+.site-root .zhome-performance-art figcaption { position:absolute; bottom:0; left:25px; right:25px; background:#fffffff5; border:1px solid #e0e9e3; box-shadow:0 10px 30px #1033210b; border-radius:10px; padding:15px 22px; display:grid; grid-template-columns:1fr 1fr; align-items:center; }
+.site-root .zhome-performance-art figcaption>span { font-size:12px; color:#6d8274; }
+.site-root .zhome-performance-art figcaption>strong { grid-row:span 2; justify-self:end; font-size:36px; letter-spacing:-.05em; }
+.site-root .zhome-performance-art figcaption>strong small { font-size:13px; }
+.site-root .zhome-performance-art figcaption>b { font-size:11px; color:var(--brand-text); font-weight:500; margin-top:7px; }
+.site-root .zhome-start { padding:95px 0; background:#eaf1ed; }
+.site-root .zhome-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:35px; padding:0; margin:50px 0; list-style:none; }
+.site-root .zhome-steps li { border-top:1px solid #c7d8cb; padding-top:22px; }
+.site-root .zhome-steps li>span { color:#8ba495; font-size:29px; font-weight:400; }
+.site-root .zhome-steps h3 { font-size:20px; margin:20px 0 12px; }
+.site-root .zhome-steps p { color:var(--z-muted); font-size:14px; line-height:1.85; min-height:65px; margin-bottom:22px; }
+.site-root .zhome-data-note { display:flex; align-items:center; gap:30px; border-top:1px solid #cddbd2; padding-top:28px; }
+.site-root .zhome-data-note>b { flex-shrink:0; font-size:15px; }
+.site-root .zhome-data-note p { font-size:12px; color:#687b6f; line-height:1.85; }
+.site-root .zhome-data-note a { white-space:nowrap; font-size:12px; }
+.site-root .zhome-closing { display:flex; justify-content:space-between; align-items:center; gap:40px; padding-block:110px; }
+.site-root .zhome-closing em { display:block; }
+.site-root .zhome-closing-secondary { display:block; text-align:center; margin-top:16px; color:#637569; font-size:12px; }
+.site-root .zhome :focus-visible { outline:3px solid var(--brand-text); outline-offset:5px; }
+@media(max-width:1000px) {
+  .site-root .zhome-hero-inner { grid-template-columns:1.3fr 1fr; }
+  .site-root .zhome-feature { gap:35px; }
+  .site-root .zhome-studio-layout { grid-template-columns:115px 1fr; }
+  .site-root .zhome-section-head { gap:30px; }
+  .site-root .zhome-issue-art { padding:20px; }
+  .site-root .zhome-issue-row [data-slot=badge] { display:none; }
+  .site-root .orbit-label { font-size:10px; padding:10px; gap:7px; }
+  .site-root .orbit-label b { margin-left:3px; }
+}
+@media(max-width:720px) {
+  .site-root .zhome-hero-inner { display:block; height:auto; min-height:0; padding-block:50px 15px; }
+  .site-root .zhome h1 { font-size:clamp(34px,7.5vw,48px); }
+  .site-root .zhome h2 { font-size:32px; }
+  .site-root .zhome-hero-copy>p { max-width:470px; font-size:15px; line-height:1.85; margin-top:22px; }
+  .site-root .zhome-badge { font-size:10px; margin-bottom:22px; }
+  .site-root .zhome-actions { margin-top:24px; gap:9px; }
+  .site-root .zhome [data-slot=button] { min-height:46px; padding-inline:14px; font-size:12px; }
+  .site-root .zhome-trust { gap:15px; font-size:10px; margin-top:20px; }
+  .site-root .zhome-orbit-labels { height:200px; margin-top:15px; }
+  .site-root .orbit-one { top:12%; left:4%; }
+  .site-root .orbit-two { top:30%; right:0; }
+  .site-root .orbit-three { top:58%; left:19%; }
+  .site-root .orbit-caption { bottom:0; right:16%; font-size:11px; }
+  .site-root .orbit-caption small { display:none; }
+  .site-root .zhome-section-head { display:block; margin-bottom:27px; }
+  .site-root .zhome-section-head>p { margin-top:17px; max-width:100%; font-size:14px; }
+  .site-root .zhome-demo { padding-block:65px 35px; }
+  .site-root .zhome-studio>header { height:43px; padding:0 13px; gap:8px; }
+  .site-root .zhome-studio>header>span { font-size:9px; }
+  .site-root .zhome-studio>header>i { display:none; }
+  .site-root .zhome-studio-layout { grid-template-columns:1fr; }
+  .site-root .zhome-studio-layout>aside { display:none; }
+  .site-root .zhome-studio-layout>section { padding:18px 13px; }
+  .site-root .zhome-panel-top h3 { font-size:17px; }
+  .site-root .zhome-panel-top p { font-size:10px; line-height:1.8; }
+  .site-root .zhome-panel-top em { display:none; }
+  .site-root .zhome-tabs { margin-top:12px; gap:20px; }
+  .site-root .zhome-metrics { gap:6px; margin-block:14px; }
+  .site-root .zhome-metrics>div { padding:10px 8px; }
+  .site-root .zhome-metrics strong { font-size:23px; }
+  .site-root .zhome-metrics small { font-size:10px; }
+  .site-root .zhome-chart-panel { padding:12px 10px; }
+  .site-root .zhome-chart { height:125px; }
+  .site-root .zhome-insight { font-size:10px; padding:10px 8px; }
+  .site-root .zhome-insight small { display:none; }
+  .site-root .zhome-demo-notes { gap:16px; font-size:11px; line-height:1.8; }
+  .site-root .zhome-demo-notes b { font-size:12px; }
+  .site-root .zhome-feature,.site-root .zhome-errors .zhome-feature { grid-template-columns:1fr; gap:32px; padding-block:65px; }
+  .site-root .zhome-feature p { font-size:15px; margin-top:18px; }
+  .site-root .zhome-feature ul { font-size:12px; margin:16px 0 22px; }
+  .site-root .zhome-errors .zhome-feature>div:last-child { grid-row:1; }
+  .site-root .zhome-feature-art { padding-bottom:130px; }
+  .site-root .zhome-flow-ui { left:10px; right:10px; bottom:14px; padding:12px; }
+  .site-root .zhome-flow-steps { gap:4px; }
+  .site-root .zhome-flow-steps>div { padding:7px; }
+  .site-root .zhome-flow-steps b { font-size:10px; }
+  .site-root .zhome-issue-art { padding:20px; }
+  .site-root .zhome-performance-art figcaption { left:12px; right:12px; padding:13px 16px; }
+  .site-root .zhome-start { padding-block:65px; }
+  .site-root .zhome-steps { grid-template-columns:1fr; gap:30px; margin:30px 0; }
+  .site-root .zhome-steps li { position:relative; padding:20px 0 0 48px; }
+  .site-root .zhome-steps li>span { position:absolute; left:0; top:18px; font-size:24px; }
+  .site-root .zhome-steps h3 { margin:0 0 10px; font-size:19px; }
+  .site-root .zhome-steps p { min-height:0; margin-bottom:13px; }
+  .site-root .zhome-data-note { display:grid; gap:12px; }
+  .site-root .zhome-closing { display:block; padding-block:70px; }
+  .site-root .zhome-closing>div:last-child { margin-top:27px; width:max-content; }
+}
+@media(prefers-reduced-motion:no-preference) {
+  .site-root .zhome [data-slot=button] { transition:transform .2s,box-shadow .2s; }
+  .site-root .zhome [data-slot=button]:hover { transform:translateY(-2px); box-shadow:0 12px 22px #14462c18; }
+}

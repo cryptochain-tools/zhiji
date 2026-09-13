@@ -1,0 +1,39 @@
+# Dependencies and generated outputs
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+**/build/
+**/*.egg-info/
+**/__pycache__/
+.test-dist/
+**/.test-dist/
+coverage/
+**/coverage/
+.turbo/
+*.tsbuildinfo
+
+# Local and deployment secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Operating-system and editor files
+.DS_Store
+.idea/
+.vscode/
+
+# Local tooling caches and diagnostics
+.vite/
+**/.vite/
+.cache/
+**/.cache/
+*.log
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.envrc
+.direnv/

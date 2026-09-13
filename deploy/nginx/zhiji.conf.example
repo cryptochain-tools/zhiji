@@ -1,0 +1,45 @@
+# The edge proxy terminates TLS for zhiji.example.com. Install this isolated HTTP
+# origin server block on the application host; adapt TLS handling to your network.
+server {
+    listen 80;
+    server_name zhiji.example.com;
+
+    root /opt/zhiji/current/apps/web/dist;
+    index index.html;
+    client_max_body_size 6m;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy no-referrer always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
+
+    # Service APIs retain the /api prefix all the way to Egg.
+    location ^~ /api/ {
+        proxy_pass http://127.0.0.1:7011;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_read_timeout 60s;
+        add_header Cache-Control "no-store" always;
+    }
+
+    location ^~ /health/ { deny all; }
+
+    # Public pages never load the management bundle and do not make network requests.
+    location = /robots.txt { try_files /public-robots.txt =404; add_header Cache-Control "public, max-age=300" always; }
+    location = /sitemap.xml { try_files /public-sitemap.xml =404; add_header Cache-Control "public, max-age=300" always; }
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Content-Security-Policy "default-src 'self'; connect-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always;
+        add_header Cache-Control "no-cache" always;
+    }
+
+    # Console has a separate HTML entry and response policy. It may only call same-origin APIs.
+    location = /console { try_files /console.html =404; add_header Content-Security-Policy "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always; add_header Cache-Control "no-store" always; }
+    location ^~ /console/ { try_files /console.html =404; add_header Content-Security-Policy "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always; add_header Cache-Control "no-store" always; }
+
+    location ^~ /assets/ { try_files $uri =404; add_header Cache-Control "public, max-age=31536000, immutable" always; }
+}
