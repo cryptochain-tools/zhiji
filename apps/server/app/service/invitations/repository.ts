@@ -108,7 +108,7 @@ export class PostgresInvitationRepository implements InvitationRepository {
 
   private async audit(transaction: DatabaseTransaction, tenantId: string, actorUserId: string, action: string, invitationId: string, metadata: Record<string, unknown>, requestId?: string) {
     await transaction.query(
-      `INSERT INTO audit_logs (id, tenant_id, actor_user_id, action, target_type, target_id, metadata)
+      `INSERT INTO audit_logs (id, tenant_id, actor_user_id, action, target_type, target_id, request_id, metadata)
        VALUES ($1,$2,$3,$4,'invitation',$5,$6,$7::jsonb)`,
       [ randomUUID(), tenantId, actorUserId, action, invitationId, requestId ?? null, JSON.stringify(metadata) ],
     )
